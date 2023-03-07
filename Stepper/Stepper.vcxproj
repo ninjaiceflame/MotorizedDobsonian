@@ -44,7 +44,9 @@
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
   <ImportGroup Label="ExtensionSettings" />
   <ImportGroup Label="Shared" />
-  <ImportGroup Label="PropertySheets" />
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|ARM'">
+    <Import Project="RaspberryPi_Remote.props" />
+  </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|ARM'">
     <RemotePostBuildEventUseInBuild>false</RemotePostBuildEventUseInBuild>
@@ -77,11 +79,16 @@
     <Link>
       <AdditionalOptions>
       </AdditionalOptions>
+      <AdditionalLibraryDirectories>%(Link.AdditionalLibraryDirectories);'/home/pi/projects/vcpkg/packages/sqlite3_x64-linux/include;%(AdditionalIncludeDirectories)'</AdditionalLibraryDirectories>
+      <AdditionalDependencies>$(StlAdditionalDependencies);%(Link.AdditionalDependencies);'/home/pi/projects/vcpkg/packages/sqlite3_x64-linux/include;%(AdditionalIncludeDirectories)'</AdditionalDependencies>
     </Link>
     <PreBuildEvent>
       <Command>
       </Command>
     </PreBuildEvent>
+    <ClCompile>
+      <AdditionalIncludeDirectories>%(ClCompile.AdditionalIncludeDirectories);'/home/pi/projects/vcpkg/packages/sqlite3_x64-linux/include;%(AdditionalIncludeDirectories)'</AdditionalIncludeDirectories>
+    </ClCompile>
   </ItemDefinitionGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets" />

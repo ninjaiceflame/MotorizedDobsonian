@@ -1,117 +1,184 @@
-
-
 #include <iostream>
 #include <thread>
 #include <chrono>
 #include <pigpio.h>
+#include <stdio.h>
+//#include <ncurses.h>
+//#include <conio.h>
 
 using namespace std;
 
+//Stepper motor 1 - Horizontal
+#define	ENA1 2
+#define DIR1 3
+#define PUL1 4
 
-#define	LED	26
-#define IN1 12 //GPIO 12
-#define IN2 16 //GPIO 16
-#define IN3 20 //GPIO 20
-#define IN4 21 //GPIO 21
-#define _DELAY 2000
-#define _STEPS 32
-#define _GEAR_RATIO 64
+//Stepper motor 2 - Vertical
+#define ENA2 17
+#define DIR2 27
+#define PUL2 22
+
+
+//#define _DELAY 64
+#define _DELAY 100
+#define _STEPS 1600
+#define _GEAR_RATIO 100 * 2
 
 
 int main(void)
 {
 	int stepsPerRev = _STEPS * _GEAR_RATIO;
+	bool myBool = false;
 
 	//Initialise GPIO
 	gpioInitialise();
 
-	//Set up GPIO for LED
-	gpioSetMode(LED, PI_OUTPUT);
+	//Set up GPIO pins for stepper motor
+	gpioSetMode(ENA1, PI_OUTPUT);
+	gpioSetMode(DIR1, PI_OUTPUT);
+	gpioSetMode(PUL1, PI_OUTPUT);
 
 	//Set up GPIO pins for stepper motor
-	gpioSetMode(IN1, PI_OUTPUT);
-	gpioSetMode(IN2, PI_OUTPUT);
-	gpioSetMode(IN3, PI_OUTPUT);
-	gpioSetMode(IN4, PI_OUTPUT);
+	gpioSetMode(ENA2, PI_OUTPUT);
+	gpioSetMode(DIR2, PI_OUTPUT);
+	gpioSetMode(PUL2, PI_OUTPUT);
 
 	//Start at 0
-	gpioWrite(IN1, PI_LOW);
-	gpioWrite(IN2, PI_LOW);
-	gpioWrite(IN3, PI_LOW);
-	gpioWrite(IN4, PI_LOW);
+	gpioWrite(ENA1, PI_LOW);
+	gpioWrite(DIR1, PI_LOW);
+	gpioWrite(PUL1, PI_LOW);
 
-	for (int i = 0; i < stepsPerRev/4; ++i)
+	//Start at 0
+	gpioWrite(ENA2, PI_LOW);
+	gpioWrite(DIR2, PI_LOW);
+	gpioWrite(PUL2, PI_LOW);
+
+	system("/bin/stty raw");
+
+	while (1)
 	{
-		//1
-		gpioWrite(IN1, PI_HIGH);
-		gpioWrite(IN2, PI_LOW);
-		gpioWrite(IN3, PI_LOW);
-		gpioWrite(IN4, PI_HIGH);
-		std::this_thread::sleep_for(std::chrono::microseconds(_DELAY));
+		////Back and forth loop:
+		//for (int i = 0; i < 16000; i++)
+		//{
+		//	cout << "stepping" << endl;
+		//	gpioWrite(PUL1, PI_HIGH);
+		//	gpioWrite(PUL2, PI_HIGH);
+		//	gpioDelay(_DELAY);
+		//	gpioWrite(PUL1, PI_LOW);
+		//	gpioWrite(PUL2, PI_LOW);
+		//	gpioDelay(_DELAY);
+		//}
+		//
+		////Switch Directions
+		//if (myBool == false)
+		//{
+		//	
+		//	gpioWrite(DIR1, PI_HIGH);
+		//	gpioWrite(DIR2, PI_HIGH);
+		//}
+		//else
+		//{
+		//	gpioWrite(DIR1, PI_LOW);
+		//	gpioWrite(DIR2, PI_LOW);
+		//}
+		//cout << "switching directions = " << myBool << endl;
+		//myBool = !myBool;
 
-		//2
-		gpioWrite(IN1, PI_HIGH);
-		gpioWrite(IN2, PI_LOW);
-		gpioWrite(IN3, PI_LOW);
-		gpioWrite(IN4, PI_LOW);
-		std::this_thread::sleep_for(std::chrono::microseconds(_DELAY));
 
-		//3
-		gpioWrite(IN1, PI_HIGH);
-		gpioWrite(IN2, PI_HIGH);
-		gpioWrite(IN3, PI_LOW);
-		gpioWrite(IN4, PI_LOW);
-		std::this_thread::sleep_for(std::chrono::microseconds(_DELAY));
+		//Keyboard control:
+		char key = NULL;
 
-		//4
-		gpioWrite(IN1, PI_LOW);
-		gpioWrite(IN2, PI_HIGH);
-		gpioWrite(IN3, PI_LOW);
-		gpioWrite(IN4, PI_LOW);
-		std::this_thread::sleep_for(std::chrono::microseconds(_DELAY));
+		key = getchar();
+		putchar(key);
+		system("/bin/stty cooked");
+		//Directional Code
+		switch (key)
+		{
+			//Up
+			case 'w':
+				gpioWrite(DIR2, PI_HIGH);
+				for (int i = 0; i < 1000; i++)
+				{
+					cout << "Moving up!" << endl;
 
-		//5
-		gpioWrite(IN1, PI_LOW);
-		gpioWrite(IN2, PI_HIGH);
-		gpioWrite(IN3, PI_HIGH);
-		gpioWrite(IN4, PI_LOW);
-		std::this_thread::sleep_for(std::chrono::microseconds(_DELAY));
+					gpioWrite(PUL2, PI_HIGH);
+					gpioDelay(_DELAY);
+					gpioWrite(PUL2, PI_LOW);
+					gpioDelay(_DELAY);
+				}
+				break;
+					
+			//Down
+			case 's':
+				gpioWrite(DIR2, PI_LOW);
+				for (int i = 0; i < 1000; i++)
+				{
+					gpioWrite(PUL2, PI_HIGH);
+					gpioDelay(_DELAY);
+					gpioWrite(PUL2, PI_LOW);
+					gpioDelay(_DELAY);
+				}
+				break;
 
-		//6
-		gpioWrite(IN1, PI_LOW);
-		gpioWrite(IN2, PI_LOW);
-		gpioWrite(IN3, PI_HIGH);
-		gpioWrite(IN4, PI_LOW);
-		std::this_thread::sleep_for(std::chrono::microseconds(_DELAY));
-		
-		//7
-		gpioWrite(IN1, PI_LOW);
-		gpioWrite(IN2, PI_LOW);
-		gpioWrite(IN3, PI_HIGH);
-		gpioWrite(IN4, PI_HIGH);
-		std::this_thread::sleep_for(std::chrono::microseconds(_DELAY));
+			//Left
+			case 'a':
+				gpioWrite(DIR1, PI_HIGH);
+				for (int i = 0; i < 1000; i++)
+				{
+					gpioWrite(PUL1, PI_HIGH);
+					gpioDelay(_DELAY);
+					gpioWrite(PUL1, PI_LOW);
+					gpioDelay(_DELAY);
+				}
+				break;
 
-		//8
-		gpioWrite(IN1, PI_LOW);
-		gpioWrite(IN2, PI_LOW);
-		gpioWrite(IN3, PI_LOW);
-		gpioWrite(IN4, PI_HIGH);
-		std::this_thread::sleep_for(std::chrono::microseconds(_DELAY));
+			//Right
+			case 'd':
+				gpioWrite(DIR1, PI_LOW);
+				for (int i = 0; i < 1000; i++)
+				{
+					gpioWrite(PUL1, PI_HIGH);
+					gpioDelay(_DELAY);
+					gpioWrite(PUL1, PI_LOW);
+					gpioDelay(_DELAY);
+				}
+				break;
+		}
+
+		//Reset
+		key = NULL;
+		gpioDelay(_DELAY);
+		//gpioWrite(PUL1, PI_LOW);
+		//gpioWrite(PUL2, PI_LOW);
 	}
 
-	//Blink loop
-	while (true)
-	{
-		cout << "Hello! - code from my pc" << endl;
+	//Code for calibration
+	bool calibrated = false;
+	bool horizontally_calibrated = false;
+	bool vertically_calibrated = false;
 
-		gpioWrite(LED, PI_HIGH);  // On
-		std::this_thread::sleep_for(std::chrono::milliseconds(1000));
+	while(!calibrated)
+	{ 
+		//Subtract horizontal
+		if (!horizontally_calibrated)
+		{
+			//gpioWrite(PUL1, PI_HIGH);
+			//gpioDelay(_DELAY);
+		}
 
-		gpioWrite(LED, PI_LOW);	  // Off
-		std::this_thread::sleep_for(std::chrono::milliseconds(1000));
+		//Subtract vertical
+		if (!vertically_calibrated)
+		{
 
+		}
 	}
+
+
+	//Psuedocode for controller demo
 
 	gpioTerminate();
 	return 0;
+
+
 }
+
