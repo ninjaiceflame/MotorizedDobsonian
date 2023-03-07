@@ -79,15 +79,15 @@
     <Link>
       <AdditionalOptions>
       </AdditionalOptions>
-      <AdditionalLibraryDirectories>%(Link.AdditionalLibraryDirectories);'/home/pi/projects/vcpkg/packages/sqlite3_x64-linux/include;%(AdditionalIncludeDirectories)'</AdditionalLibraryDirectories>
-      <AdditionalDependencies>$(StlAdditionalDependencies);%(Link.AdditionalDependencies);'/home/pi/projects/vcpkg/packages/sqlite3_x64-linux/include;%(AdditionalIncludeDirectories)'</AdditionalDependencies>
+      <AdditionalLibraryDirectories>%(Link.AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>$(StlAdditionalDependencies)</AdditionalDependencies>
     </Link>
     <PreBuildEvent>
       <Command>
       </Command>
     </PreBuildEvent>
     <ClCompile>
-      <AdditionalIncludeDirectories>%(ClCompile.AdditionalIncludeDirectories);'/home/pi/projects/vcpkg/packages/sqlite3_x64-linux/include;%(AdditionalIncludeDirectories)'</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>%(ClCompile.AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
   </ItemDefinitionGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
