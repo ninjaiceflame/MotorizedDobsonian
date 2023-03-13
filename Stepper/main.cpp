@@ -79,7 +79,7 @@ int main(void)
 
 	while (1)
 	{
-		myTime.getTime();
+		myTime.getGMT();
 		////				Begin Back and forth loop				//
 		//for (int i = 0; i < 16000; i++)
 		//{

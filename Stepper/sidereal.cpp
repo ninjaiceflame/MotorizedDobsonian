@@ -13,7 +13,7 @@
 * Precondition:		none
 * Postcondition:	Outputs GMT Month, Day, Year, and Hour, Minute, Seconds
 ************************************************************************/
-void sidereal::getTime()
+tm sidereal::getGMT()
 {
 	//Get time
 	time(&m_rawTime);
@@ -24,4 +24,10 @@ void sidereal::getTime()
 	//Outputs GMT Month, Day, Year, and Hour, Minute, Second. These values will be used for calculations in the future
 	cout << (timeInfo->tm_mon + 1) << " " << timeInfo->tm_mday << " " << (timeInfo->tm_year + 1900) << " " << timeInfo->tm_hour<< " " << timeInfo->tm_min << " " << timeInfo->tm_sec << endl;
 
+	return *timeInfo;
+}
+
+double sidereal::getERA()
+{
+	return 2(M_PI)(OFFSET + EARTHS_ROTATIONAL_SPEED * /*JD -  2451545.0*/);
 }
