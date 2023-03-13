@@ -1,12 +1,24 @@
+/*************************************************************
+* Author:			Nathan Wiley
+* Filename:			main.cpp
+* Date Created:		01/01/1979
+* Modifications:	3/12/2023
+* Purpose:			Control 2 stepper motors at a time
+**************************************************************/
 #include <iostream>
 #include <thread>
 #include <chrono>
 #include <pigpio.h>
 #include <stdio.h>
-//#include <ncurses.h>
-//#include <conio.h>
+#include <pthread.h>
+#include <thread>
+#include <cmath>
 
-using namespace std;
+#include "sidereal.h"
+
+using std::cout;
+using std::endl;
+
 
 //Stepper motor 1 - Horizontal
 #define	ENA1 2
@@ -63,8 +75,12 @@ int main(void)
 	gpioWrite(DIR2, PI_LOW);
 	gpioWrite(PUL2, PI_LOW);
 
+	
+	sidereal myTime;
+
 	while (1)
 	{
+		myTime.getTime();
 		////				Begin Back and forth loop				//
 		//for (int i = 0; i < 16000; i++)
 		//{
@@ -96,122 +112,122 @@ int main(void)
 	
 
 		//				Begin Keyboard Directional Code				//
-		////Keyboard control:
-		//char key = NULL;
+		//Keyboard control:
+		char key = NULL;
 
-		//key = getchar();
-		//switch (key)
-		//{
-		//	//Up
-		//	case 'w':
-		//		gpioWrite(DIR2, PI_HIGH);
-		//		for (int i = 0; i < 1000; i++)
-		//		{
-		//			cout << "Moving up!" << endl;
+		key = getchar();
+		switch (key)
+		{
+			//Up
+			case 'w':
+				gpioWrite(DIR2, PI_HIGH);
+				for (int i = 0; i < 1000; i++)
+				{
+					cout << "Moving up!" << endl;
 
-		//			gpioWrite(PUL2, PI_HIGH);
-		//			gpioDelay(_DELAY);
-		//			gpioWrite(PUL2, PI_LOW);
-		//			gpioDelay(_DELAY);
-		//		}
-		//		break;
-		//			
-		//	//Down
-		//	case 's':
-		//		gpioWrite(DIR2, PI_LOW);
-		//		for (int i = 0; i < 1000; i++)
-		//		{
-		//			gpioWrite(PUL2, PI_HIGH);
-		//			gpioDelay(_DELAY);
-		//			gpioWrite(PUL2, PI_LOW);
-		//			gpioDelay(_DELAY);
-		//		}
-		//		break;
+					gpioWrite(PUL2, PI_HIGH);
+					gpioDelay(_DELAY);
+					gpioWrite(PUL2, PI_LOW);
+					gpioDelay(_DELAY);
+				}
+				break;
+					
+			//Down
+			case 's':
+				gpioWrite(DIR2, PI_LOW);
+				for (int i = 0; i < 1000; i++)
+				{
+					gpioWrite(PUL2, PI_HIGH);
+					gpioDelay(_DELAY);
+					gpioWrite(PUL2, PI_LOW);
+					gpioDelay(_DELAY);
+				}
+				break;
 
-		//	//Left
-		//	case 'a':
-		//		gpioWrite(DIR1, PI_HIGH);
-		//		for (int i = 0; i < 1000; i++)
-		//		{
-		//			gpioWrite(PUL1, PI_HIGH);
-		//			gpioDelay(_DELAY);
-		//			gpioWrite(PUL1, PI_LOW);
-		//			gpioDelay(_DELAY);
-		//		}
-		//		break;
+			//Left
+			case 'a':
+				gpioWrite(DIR1, PI_HIGH);
+				for (int i = 0; i < 1000; i++)
+				{
+					gpioWrite(PUL1, PI_HIGH);
+					gpioDelay(_DELAY);
+					gpioWrite(PUL1, PI_LOW);
+					gpioDelay(_DELAY);
+				}
+				break;
 
-		//	//Right
-		//	case 'd':
-		//		gpioWrite(DIR1, PI_LOW);
-		//		for (int i = 0; i < 1000; i++)
-		//		{
-		//			gpioWrite(PUL1, PI_HIGH);
-		//			gpioDelay(_DELAY);
-		//			gpioWrite(PUL1, PI_LOW);
-		//			gpioDelay(_DELAY);
-		//		}
-		//		break;
-		//}
+			//Right
+			case 'd':
+				gpioWrite(DIR1, PI_LOW);
+				for (int i = 0; i < 1000; i++)
+				{
+					gpioWrite(PUL1, PI_HIGH);
+					gpioDelay(_DELAY);
+					gpioWrite(PUL1, PI_LOW);
+					gpioDelay(_DELAY);
+				}
+				break;
+		}
 
 		//Reset
-		//key = NULL;
-		//gpioDelay(_DELAY);
+		key = NULL;
+		gpioDelay(_DELAY);
 		////			End Keyboard Directional Code				//
 
 		//				Begin Controller Code						//
 
 		//If Up or Down:
-		
-		if (!gpioRead(A_BTN))
-		{
-			//Set Direction
-			gpioWrite(DIR2, PI_HIGH);
-			gpioDelay(_DELAY);
+		//
+		//if (!gpioRead(A_BTN))
+		//{
+		//	//Set Direction
+		//	gpioWrite(DIR2, PI_HIGH);
+		//	gpioDelay(_DELAY);
 
-			//Pulse
-			gpioWrite(PUL2, PI_HIGH);
-			gpioDelay(_DELAY);
-			gpioWrite(PUL2, PI_LOW);
-			gpioDelay(_DELAY);
-		}
-		else if (!gpioRead(C_BTN))
-		{
-			//Set Direction
-			gpioWrite(DIR2, PI_LOW);
-			gpioDelay(_DELAY);
+		//	//Pulse
+		//	gpioWrite(PUL2, PI_HIGH);
+		//	gpioDelay(_DELAY);
+		//	gpioWrite(PUL2, PI_LOW);
+		//	gpioDelay(_DELAY);
+		//}
+		//else if (!gpioRead(C_BTN))
+		//{
+		//	//Set Direction
+		//	gpioWrite(DIR2, PI_LOW);
+		//	gpioDelay(_DELAY);
 
-			//Pulse
-			gpioWrite(PUL2, PI_HIGH);
-			gpioDelay(_DELAY);
-			gpioWrite(PUL2, PI_LOW);
-			gpioDelay(_DELAY);
+		//	//Pulse
+		//	gpioWrite(PUL2, PI_HIGH);
+		//	gpioDelay(_DELAY);
+		//	gpioWrite(PUL2, PI_LOW);
+		//	gpioDelay(_DELAY);
 
-		}
+		//}
 
-		//If Left or Right
-		if (!gpioRead(D_BTN))
-		{
-			//Set Direction Left
-			gpioWrite(DIR1, PI_HIGH);
-			gpioDelay(_DELAY);
+		////If Left or Right
+		//if (!gpioRead(D_BTN))
+		//{
+		//	//Set Direction Left
+		//	gpioWrite(DIR1, PI_HIGH);
+		//	gpioDelay(_DELAY);
 
-			//Pulse
-			gpioWrite(PUL1, PI_HIGH);
-			gpioDelay(_DELAY);
-			gpioWrite(PUL1, PI_LOW);
-			gpioDelay(_DELAY);
-		}
-		else if (!gpioRead(B_BTN))
-		{
-			//Set Direction Right
-			gpioWrite(DIR1, PI_LOW);
-			gpioDelay(_DELAY);
+		//	//Pulse
+		//	gpioWrite(PUL1, PI_HIGH);
+		//	gpioDelay(_DELAY);
+		//	gpioWrite(PUL1, PI_LOW);
+		//	gpioDelay(_DELAY);
+		//}
+		//else if (!gpioRead(B_BTN))
+		//{
+		//	//Set Direction Right
+		//	gpioWrite(DIR1, PI_LOW);
+		//	gpioDelay(_DELAY);
 
-			gpioWrite(PUL1, PI_HIGH);
-			gpioDelay(_DELAY);
-			gpioWrite(PUL1, PI_LOW);
-			gpioDelay(_DELAY);
-		}
+		//	gpioWrite(PUL1, PI_HIGH);
+		//	gpioDelay(_DELAY);
+		//	gpioWrite(PUL1, PI_LOW);
+		//	gpioDelay(_DELAY);
+		//}
 		//				End Controller Code							//
 	}
 
