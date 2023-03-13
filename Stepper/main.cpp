@@ -3,7 +3,7 @@
 * Filename:			main.cpp
 * Date Created:		01/01/1979
 * Modifications:	3/12/2023
-* Purpose:			Control 2 stepper motors at a time
+* Purpose:			Control 2 stepper motors at a time, prints GMT time to console
 **************************************************************/
 #include <iostream>
 #include <thread>
@@ -18,7 +18,6 @@
 
 using std::cout;
 using std::endl;
-
 
 //Stepper motor 1 - Horizontal
 #define	ENA1 2

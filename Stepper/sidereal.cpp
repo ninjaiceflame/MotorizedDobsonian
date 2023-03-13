@@ -11,12 +11,14 @@
 * Function:			getTime
 * Purpose: 			Prints out local time
 * Precondition:		none
-* Postcondition:	none
+* Postcondition:	Outputs GMT Month, Day, Year, and Hour, Minute, Seconds
 ************************************************************************/
 void sidereal::getTime()
 {
+	//Get time
 	time(&m_rawTime);
 
+	//Set timeInfo struct equal to return value of gmtime()
 	timeInfo = gmtime(&m_rawTime);
 
 	//Outputs GMT Month, Day, Year, and Hour, Minute, Second. These values will be used for calculations in the future
