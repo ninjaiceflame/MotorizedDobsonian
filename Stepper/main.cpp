@@ -1,9 +1,9 @@
 /*************************************************************
 * Author:			Nathan Wiley
 * Filename:			main.cpp
-* Date Created:		01/01/1979
-* Modifications:	3/12/2023
-* Purpose:			Control 2 stepper motors at a time, prints GMT time to console
+* Date Created:		1/17/2023
+* Modifications:	3/15/2023
+* Purpose:			Control 2 stepper motors at a time, prints Julian date, ERA, and GMST to console
 **************************************************************/
 #include <iostream>
 #include <thread>
@@ -43,8 +43,8 @@ using std::endl;
 int main(void)
 {
 	int stepsPerRev = _STEPS * _GEAR_RATIO;
-	bool myBool = false;
-
+	// For back and forth loop: bool myBool = false;
+	
 	//Initialise GPIO
 	gpioInitialise();
 
@@ -74,12 +74,30 @@ int main(void)
 	gpioWrite(DIR2, PI_LOW);
 	gpioWrite(PUL2, PI_LOW);
 
-	
-	sidereal myTime;
+
+	//Custom coordinates 
+	degreeMinuteSeconds latitude;
+	latitude.degrees = 42;
+	latitude.minutes = 13;
+	latitude.seconds = 29.7048;
+
+	degreeMinuteSeconds longitude;
+	longitude.degrees = 121;
+	longitude.minutes = 46;
+	longitude.seconds = 51.4272;
+
+	double latitudeDeg = sidereal::dmsToDeg(latitude);
+	double longitudeDeg = sidereal::dmsToDeg(longitude);
+
 
 	while (1)
 	{
-		myTime.getGMT();
+		sidereal::getGMT();
+		cout << "Lat: " << latitudeDeg << " Long: " << longitudeDeg << endl;
+		cout << fixed << sidereal::getJulianDate() << endl;
+		cout << fixed << "ERA  = " << sidereal::getERA() << endl;
+		cout << fixed << "GMST = " << sidereal::getGMSTinDEG() << endl;
+
 		////				Begin Back and forth loop				//
 		//for (int i = 0; i < 16000; i++)
 		//{
@@ -122,8 +140,6 @@ int main(void)
 				gpioWrite(DIR2, PI_HIGH);
 				for (int i = 0; i < 1000; i++)
 				{
-					cout << "Moving up!" << endl;
-
 					gpioWrite(PUL2, PI_HIGH);
 					gpioDelay(_DELAY);
 					gpioWrite(PUL2, PI_LOW);
@@ -171,6 +187,7 @@ int main(void)
 		//Reset
 		key = NULL;
 		gpioDelay(_DELAY);
+
 		////			End Keyboard Directional Code				//
 
 		//				Begin Controller Code						//

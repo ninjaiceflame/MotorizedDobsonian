@@ -17,36 +17,63 @@
 #include <time.h>
 
 using namespace std;
+using namespace std::chrono;
+
+/************************************************************************
+* Struct: 		degreeMinuteSeconds
+* Purpose:		Holds data for degree minute seconds format. Ex 57 Deg,29',32"
+* Data members:	degrees	- Holds degrees
+*				minutes	- Holds minutes
+*				seconds	- Holds seconds
+*************************************************************************/
+typedef struct degreeMinuteSeconds
+{
+	double degrees;
+	double minutes;
+	double seconds;
+} degreeMinuteSeconds;
 
 /************************************************************************
 * Class: 		sidereal
-* Purpose:		Use local time and coordinates to calculate local sidereal time
-* Data members:	myDataMembers
-* Methods:		myMethods
+* Purpose:		Use local time and coordinates to calculate local sidereal time, includes a toolkit of handy functions
+* Data members:	none
+* Methods:		getGMT
+*				getJulianDate
+*				getERA
+*				getGMSTinDEG
+*				degToDms
+*				dmsToDeg
+*				getGMST
+*				getLMST
 *************************************************************************/
 class sidereal
 {
-	//Data Members
-	public: 
-
-		time_t m_rawTime;
-		struct tm* timeInfo;
-
-	private:
-
 	//Methods:
 	public:
 		//Returns Greenwich Mean Time – GMT Time Zone / Coordinated Universal Time (Standard Time)
-		tm getGMT();
+		static tm getGMT();
+
+		//Returns local julian date
+		static double getJulianDate();
 
 		//Returns Earth rotation angle in radians
-		double getERA();
+		static double getERA();
 
-		//Returns Greenwich Mean Sidereal Time
-		tm getGMST();
+		//Returns Greenwich Mean Sidereal Time in degrees
+		static double getGMSTinDEG();
+
+		//Returns degreeMinuteSeconds struct after converting a degree
+		static degreeMinuteSeconds degToDms(double deg);
+
+		//Returns deouble degree after converting a degreeMinuteSecond struct
+		static double dmsToDeg(degreeMinuteSeconds dms);
+
+		//Returns a tm struct for current Greenwich Mean Sidereal Time
+		static struct degreeMinuteSeconds getGMST();
 
 		//Returns Local Mean Sidereal Time
-		tm getLMST();
+		static double getLMST();
+		 
 	private:
 };
 
