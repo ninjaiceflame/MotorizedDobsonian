@@ -25,6 +25,36 @@ tm sidereal::getGMT()
 	return *timeInfo;
 }
 
+void sidereal::displayTmMMDDYYYY(tm timeInfo)
+{
+	cout << timeInfo.tm_mon << " " << timeInfo.tm_mday << " " << timeInfo.tm_year << endl;
+}
+
+void sidereal::displayHHMMSS(hourMinuteSeconds timeInfo)
+{
+	cout << "H:" << timeInfo.hours << " M:" << timeInfo.minutes << " S:" << timeInfo.seconds << endl;
+}
+
+double sidereal::hmsToDeg(hourMinuteSeconds timeInfo)
+{
+	return (timeInfo.hours / 24) + (timeInfo.minutes / 1440) + (timeInfo.seconds / 86400);
+}
+
+hourMinuteSeconds sidereal::degToHms(double deg)
+{
+	hourMinuteSeconds timeInfo;
+
+	timeInfo.hours = (floor(deg/15));
+	deg -= timeInfo.hours*15;
+
+	timeInfo.minutes = floor(deg * 4 );
+	deg -= (timeInfo.minutes / 4);
+
+	timeInfo.seconds = (deg * 240);
+
+	return timeInfo;
+}
+
 /**********************************************************************
 * Function:			getJulianDate
 * Purpose: 			insert purpose
@@ -60,17 +90,58 @@ double sidereal::getJulianDate()
 ************************************************************************/
 double sidereal::getERA()
 {
-	return (2 * M_PI * (OFFSET + EARTHS_ROTATIONAL_SPEED * (getJulianDate() - 2451545.0)));
+	double theta = (2 * M_PI * (OFFSET + EARTHS_ROTATIONAL_SPEED * (getJulianDate() - 2451545.0)));
+
+	theta = fmod(theta, 2 * M_PI);
+	if (theta < 0)
+	{
+		theta += 2 * M_PI;
+	}
+
+	return theta;
 }
 
+double sidereal::getERAcomplex()
+{
+	double frac = fmod((getJulianDate()) - 2451545.0, 1);
+	double theta = fmod((2 * M_PI * (OFFSET + 0.00273781191135448 * (getJulianDate() - 2451545.0) + frac)), (M_PI*2)); //eq 14
+
+	if (theta < 0)
+	{
+		theta += 2 * M_PI;
+	}
+	return theta;
+}
 
 double sidereal::getGMSTinDEG()
 {
 	double GMST;
 	double j2000 = getJulianDate() - 2451545.0;
-	GMST = 100.4606184 + (0.9856473662862 * j2000);
+	tm timeInfo = getGMT();
+	GMST = 100.4606184 + (0.9856473662862 * j2000) + (15 *( timeInfo.tm_hour + (timeInfo.tm_min / 60) + (timeInfo.tm_sec / 3600)));
 
+	GMST = fmod(GMST, 360);
+
+	if (GMST < 0)
+	{
+		GMST += 360;
+	}
 	return GMST;
+}
+
+double sidereal::getGMSTinRads()
+{
+	double t = ((getJulianDate()- 2451545.0)/ 36525.0);
+
+	double gmst = getERAcomplex() + (0.014506 + (4612.156534 * t) + (1.3915817 * t * t) - (0.00000044 * t * t * t) - (0.000029956 * t * t * t * t) - (0.0000000368 * t * t * t * t * t)) / 60.0 / 60.0 *( M_PI / 180.0);
+
+	gmst = fmod(gmst,2 * M_PI);
+
+	if (gmst < 0)
+	{
+		gmst += 2 * M_PI;
+	}
+	return gmst;
 }
 
 /**********************************************************************
@@ -105,17 +176,7 @@ double sidereal::dmsToDeg(degreeMinuteSeconds dms)
 	return dms.degrees + (dms.minutes / 60.0) + (dms.seconds / 3600.0);
 }
 
-struct degreeMinuteSeconds sidereal::getGMST()
+double sidereal::getLMST(double rads, double longitudeWest)
 {
-	struct degreeMinuteSeconds dms;
-
-	return dms;
-}
-
-
-double sidereal::getLMST()
-{
-	double LMST;
-
-	return LMST;
+	return ((rads*180)/M_PI - longitudeWest);
 }

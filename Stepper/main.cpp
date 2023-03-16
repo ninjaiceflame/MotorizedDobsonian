@@ -6,13 +6,7 @@
 * Purpose:			Control 2 stepper motors at a time, prints Julian date, ERA, and GMST to console
 **************************************************************/
 #include <iostream>
-#include <thread>
-#include <chrono>
 #include <pigpio.h>
-#include <stdio.h>
-#include <pthread.h>
-#include <thread>
-#include <cmath>
 
 #include "sidereal.h"
 
@@ -89,15 +83,23 @@ int main(void)
 	double latitudeDeg = sidereal::dmsToDeg(latitude);
 	double longitudeDeg = sidereal::dmsToDeg(longitude);
 
-
 	while (1)
 	{
+		double deg = sidereal::getERA() *( 180 / M_PI);
+		double LMST = sidereal::getLMST(sidereal::getERA(), 121.781);
 		sidereal::getGMT();
 		cout << "Lat: " << latitudeDeg << " Long: " << longitudeDeg << endl;
 		cout << fixed << sidereal::getJulianDate() << endl;
 		cout << fixed << "ERA  = " << sidereal::getERA() << endl;
-		cout << fixed << "GMST = " << sidereal::getGMSTinDEG() << endl;
+		cout << fixed << "ERA  = " << sidereal::getERAcomplex() << " - complex" << endl;
+		cout << fixed << "GMST = " << sidereal::getGMSTinDEG() << " - degrees " << endl;
+		cout << fixed << "GMST = " << sidereal::getGMSTinRads() << " - rads" << endl;
 
+		cout << "LMST in Deg: " << LMST << endl;
+		cout << "LMST in HH:MM:SS: ";
+		sidereal::displayHHMMSS(sidereal::degToHms(LMST));
+		cout << "Sidereal Time: ";
+		sidereal::displayHHMMSS(sidereal::degToHms(deg));
 		////				Begin Back and forth loop				//
 		//for (int i = 0; i < 16000; i++)
 		//{
