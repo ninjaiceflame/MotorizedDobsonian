@@ -2,22 +2,20 @@
 * Author:			Nathan Wiley
 * Filename:			sidereal.h
 * Date Created:		3/12/2023
-* Modifications:	3/12/2023
+* Modifications:	3/116/2023
 * Purpose:			Calculates local sidereal time
 **************************************************************/
 #pragma once
 
+#include <iostream> //For cout
+#include <math.h>	//M_PI, floor()
+#include <time.h>	//time(), time_t, tm, and __isleap()
+
 #define EARTHS_ROTATIONAL_SPEED 1.00273781191135448
 #define OFFSET 0.7790572732640
 
-#include <iostream> //For cout
-//#include <cmath>
-#include <math.h>	//M_PI, floor()
-//#include <chrono>
-#include <time.h>	//time(), time_t, tm, and __isleap()
-
-using namespace std;
-//using namespace std::chrono;
+using std::cout;
+using std::endl;
 
 /************************************************************************
 * Struct: 		degreeMinuteSeconds
@@ -72,10 +70,13 @@ class sidereal
 		/*************************** Utility Functions ********************************/
 		static void displayTmMMDDYYYY(tm timeInfo);
 		static void displayHHMMSS(hourMinuteSeconds timeInfo);
+		static void displayDms(degreeMinuteSeconds timeInfo);
 		static double hmsToDeg(hourMinuteSeconds timeInfo);
+		static double hmsToDeg(double hours, double minutes, double seconds);
 		static hourMinuteSeconds degToHms(double deg);
 		static degreeMinuteSeconds degToDms(double deg); //Returns degreeMinuteSeconds struct after converting a degree
 		static double dmsToDeg(degreeMinuteSeconds dms); //Returns deouble degree after converting a degreeMinuteSecond struct
+		static double dmsToDeg(double degrees, double minutes, double seconds);
 
 		/************************* Time and Date Getters ******************************/
 		//Returns Greenwich Mean Time – GMT Time Zone / Coordinated Universal Time (Standard Time)

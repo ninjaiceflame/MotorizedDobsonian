@@ -71,10 +71,12 @@
     </RemotePostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="coordinate.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="sidereal.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="coordinate.h" />
     <ClInclude Include="sidereal.h" />
   </ItemGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|ARM'">

@@ -2,11 +2,10 @@
 * Author:			Nathan Wiley
 * Filename:			sidereal.h
 * Date Created:		3/12/2023
-* Modifications:	3/15/2023
+* Modifications:	3/16/2023
 * Purpose:			Calculates local sidereal time
 **************************************************************/
 #include "sidereal.h"
-
 
 /**********************************************************************
 * Function:			displayTmMMDDYYYY
@@ -29,15 +28,31 @@ void sidereal::displayHHMMSS(hourMinuteSeconds timeInfo)
 	cout << "H:" << timeInfo.hours << " M:" << timeInfo.minutes << " S:" << timeInfo.seconds << endl;
 }
 
+void sidereal::displayDms(degreeMinuteSeconds timeInfo)
+{
+	cout << timeInfo.degrees << "Deg " << timeInfo.minutes << "m " << timeInfo.seconds << "s" << endl;
+}
+
 /**********************************************************************
 * Function:			hmsToDeg
 * Purpose: 			Converts a struct of hours, minutes, and seconds to decimal degrees
 * Precondition:		Pass in an initialized tm struct to timeInfo
-* Postcondition:	Heturns a struct of hours, minutes, and seconds
+* Postcondition:	Returns values as a single decimal degree
 ************************************************************************/
 double sidereal::hmsToDeg(hourMinuteSeconds timeInfo)
 {
-	return (timeInfo.hours / 24) + (timeInfo.minutes / 1440) + (timeInfo.seconds / 86400);
+	return (timeInfo.hours * 15.0) + (timeInfo.minutes / 4.0)) + (timeInfo.seconds / 240.0);
+}
+
+/**********************************************************************
+* Function:			hmsToDeg (override
+* Purpose: 			Converts hours, minutes, and seconds to decimal degrees
+* Precondition:		Pass in hours, minute, and seconds to function
+* Postcondition:	Returns a struct of hours, minutes, and seconds
+************************************************************************/
+double sidereal::hmsToDeg(double hours, double minutes, double seconds)
+{
+	return (hours * 15.0) + (minutes / 4.0) + (seconds / 240.0);
 }
 
 /**********************************************************************
@@ -91,6 +106,17 @@ degreeMinuteSeconds sidereal::degToDms(double deg)
 double sidereal::dmsToDeg(degreeMinuteSeconds dms)
 {
 	return dms.degrees + (dms.minutes / 60.0) + (dms.seconds / 3600.0);
+}
+
+/**********************************************************************
+* Function:			dmstoDeg (override)
+* Purpose: 			Converts Degrees Minute Seconds to a flat degree decimal
+* Precondition:		Pass in degree, minutes, and seconds into function Ex: 4 Deg 50' 12"
+* Postcondition:	Returns double contatining the degrees as a fraction is returned	Ex: 4.836667
+************************************************************************/
+double sidereal::dmsToDeg(double degrees, double minutes, double seconds)
+{
+	return degrees + (minutes / 60.0) + (seconds / 3600.0);
 }
 
 /**********************************************************************
@@ -161,7 +187,6 @@ double sidereal::getJulianDate()
 
 	return julianDate;
 }
-
 
 /**********************************************************************
 * Function:			getGMSTinRads

@@ -2,19 +2,20 @@
 * Author:			Nathan Wiley
 * Filename:			main.cpp
 * Date Created:		1/17/2023
-* Modifications:	3/15/2023
+* Modifications:	3/16/2023
 * Purpose:			Control 2 stepper motors at a time, prints Julian date, ERA, and GMST to console
 **************************************************************/
 #include <iostream>		//cout, endl
 #include <pigpio.h>		//gpio access for Raspberry Pi
 
-#include "sidereal.h"	//Custom class for calculating time and angles
-
+#include "sidereal.h"	//Custom class for calculating time and time angles
+#include "coordinate.h" //Custom class for calculating coordinates and reference frames
 #include <chrono>		//Used for testing
 #include <thread>		//Used for testing
 
 using std::cout;
 using std::endl;
+using std::fixed;
 
 //Stepper motor 1 - Horizontal
 #define	ENA1 2
@@ -85,6 +86,18 @@ int main(void)
 	//Converting coordinates from degree minute seconds to degrees decimal
 	double latitudeDeg = sidereal::dmsToDeg(latitude);
 	double longitudeDeg = sidereal::dmsToDeg(longitude);
+	
+	//Test with Amdromeda
+	twoAxisDeg RaDecInput;
+	RaDecInput.x = sidereal::hmsToDeg(0, 42, 42.72);
+	RaDecInput.y = sidereal::dmsToDeg(41, 16, 4.9);
+
+	twoAxisDeg latLong;
+	latLong.x = latitudeDeg;
+	latLong.y = longitudeDeg;
+
+	twoAxisDeg temp;
+	twoAxisDms AltAz;
 
 	while (1)
 	{
@@ -93,48 +106,25 @@ int main(void)
 
 		//Status for console
 		cout << endl << endl;
-		cout << "Lat: " << latitudeDeg << " Long: " << longitudeDeg << endl;
-		cout << fixed << sidereal::getJulianDate() << endl;
-		cout << fixed << "GMST = " << sidereal::getGMSTinRads() << " (in Radians)" << endl;
-		cout << "LMST in Deg: " << LMST << endl;
-		cout << "LMST in HH:MM:SS: ";
-		sidereal::displayHHMMSS(sidereal::degToHms(LMST));	
-		
-		// Using time point and system_clock *******************************************************
-		std::chrono::time_point<std::chrono::system_clock> start, end;
-		start = std::chrono::system_clock::now();
+		//cout << "Lat: " << latitudeDeg << " Long: " << longitudeDeg << endl;
+		//cout << fixed << sidereal::getJulianDate() << endl;
+		//cout << fixed << "GMST = " << sidereal::getGMSTinRads() << " (in Radians)" << endl;
+		//cout << "LMST in Deg: " << LMST << endl;
+		//cout << "LMST in HH:MM:SS: ";
+		//sidereal::displayHHMMSS(sidereal::degToHms(LMST));	
+		cout << "RA Deg input: " << RaDecInput.x << "Dec Deg input: " << RaDecInput.y << endl;
+		cout << "Andromeda RA:  "; sidereal::displayHHMMSS(sidereal::degToHms(RaDecInput.x));
+		cout << "Andromeda Dec: "; sidereal::displayDms(sidereal::degToDms(RaDecInput.y));
 
-		sidereal::getERA();
+		temp = coordinate::equatorialToLocalJ2000(RaDecInput.x, RaDecInput.y, latLong);
+		AltAz.x = sidereal::degToDms(temp.x);
+		AltAz.y = sidereal::degToDms(temp.y);
 
-		//End timer
-		end = std::chrono::system_clock::now();
-		std::chrono::duration<float> elapsed_seconds = end - start;
-		std::cout << "getERA() elapsed time: " << std::fixed << elapsed_seconds.count() << "s\n";
+		cout << "Calculation:  " << endl;
+		cout << "Alt: "; sidereal::displayDms(AltAz.x);
+		cout << "Az:  "; sidereal::displayDms(AltAz.y);
 
-
-		// Using time point and system_clock *******************************************************
-		std::chrono::time_point<std::chrono::system_clock> start2, end2;
-		start2 = std::chrono::system_clock::now();
-
-		sidereal::getERAcomplex();
-
-		//End timer
-		end2 = std::chrono::system_clock::now();
-		std::chrono::duration<float> elapsed_seconds2 = end2 - start2;
-		std::cout << "getERAcomplex() elapsed time: " << std::fixed << elapsed_seconds2.count() << "s\n";
-
-
-		// Using time point and system_clock *******************************************************
-		std::chrono::time_point<std::chrono::system_clock> start3, end3;
-		start3 = std::chrono::system_clock::now();
-
-		sidereal::getGMSTinRads();
-
-		//End timer
-		end3 = std::chrono::system_clock::now();
-		std::chrono::duration<float> elapsed_seconds3 = end3 - start3;
-		std::cout << "getGMSTinRads() elapsed time: " << std::fixed << elapsed_seconds3.count() << "s\n";
-
+		std::this_thread::sleep_for(std::chrono::seconds(1));
 		////				Begin Back and forth loop				//
 		//for (int i = 0; i < 16000; i++)
 		//{
