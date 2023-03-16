@@ -21,7 +21,7 @@ using namespace std;
 
 /************************************************************************
 * Struct: 		degreeMinuteSeconds
-* Purpose:		Holds data for degree minute seconds format. Ex 57 Deg,29',32"
+* Purpose:		Holds data for degree minute seconds format. Ex. 57 Deg,29',32"
 * Data members:	degrees	- Holds degrees
 *				minutes	- Holds minutes
 *				seconds	- Holds seconds
@@ -33,31 +33,43 @@ typedef struct degreeMinuteSeconds
 	double seconds;
 } degreeMinuteSeconds;
 
+/************************************************************************
+* Struct: 		degreeMinuteSeconds
+* Purpose:		Holds data for hour minute seconds format. Ex. 23H 32M 14.23S
+* Data members:	hours	- Holds hours
+*				minutes	- Holds minutes
+*				seconds	- Holds seconds
+*************************************************************************/
 typedef struct hourMinuteSeconds
 {
 	double hours;
 	double minutes;
 	double seconds;
 } hourMinuteSeconds;
+
 /************************************************************************
 * Class: 		sidereal
 * Purpose:		Use local time and coordinates to calculate local sidereal time, includes a toolkit of handy functions
 * Data members:	none
-* Methods:		getGMT
-*				getJulianDate
-*				getERA
-*				getGMSTinDEG
+* Methods:		displayTmMMDDYYYY
+*				displayHHMMSS
+*				hmsToDeg
+*				degToHms
 *				degToDms
 *				dmsToDeg
-*				getGMST
+				getGMT
 *				getLMST
+*				getJulianDate
+*				getERA
+*				getERAcomplex
+*				getGMSTinDEG
 *************************************************************************/
 class sidereal
 {
 	//Methods:
 	public:
 
-		/***************************Utility Functions********************************/
+		/*************************** Utility Functions ********************************/
 		static void displayTmMMDDYYYY(tm timeInfo);
 		static void displayHHMMSS(hourMinuteSeconds timeInfo);
 		static double hmsToDeg(hourMinuteSeconds timeInfo);
@@ -65,23 +77,19 @@ class sidereal
 		static degreeMinuteSeconds degToDms(double deg); //Returns degreeMinuteSeconds struct after converting a degree
 		static double dmsToDeg(degreeMinuteSeconds dms); //Returns deouble degree after converting a degreeMinuteSecond struct
 
-		/*************************Time and Date Getters******************************/
+		/************************* Time and Date Getters ******************************/
 		//Returns Greenwich Mean Time – GMT Time Zone / Coordinated Universal Time (Standard Time)
 		static tm getGMT();
+
+		//Returns Local Mean Sidereal Time - Use getGMSTinRads for best accuracy
+		static double getLMST(double rads, double longitudeEast);
 
 		//Returns local julian date
 		static double getJulianDate();
 
-
-		//Sidereal time Ordered most accurate to least accurate
+		//Sidereal time - Ordered most accurate to least accurate
+		static double getGMSTinRads();	//Returns Greenwich Mean Sidereal Time (GMST) in radians. Precisely in tune with apparant local sidereal time calculations
 		static double getERA();			//Returns Earth Rotation Angle (ERA) in radians
 		static double getERAcomplex();	//Another method of getting Earth's Rotation Angle (ERA) in radians
-		static double getGMSTinRads();	//Returns Greenwich Mean Sidereal Time (GMST) in radians
 		static double getGMSTinDEG();	//Returns Greenwich Mean Sidereal Time (GMST) in degrees
-
-		//Returns Local Mean Sidereal Time
-		static double getLMST(double rads, double longitudeWest);
-		 
-	private:
 };
-

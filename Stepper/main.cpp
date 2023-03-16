@@ -5,10 +5,13 @@
 * Modifications:	3/15/2023
 * Purpose:			Control 2 stepper motors at a time, prints Julian date, ERA, and GMST to console
 **************************************************************/
-#include <iostream>
-#include <pigpio.h>
+#include <iostream>		//cout, endl
+#include <pigpio.h>		//gpio access for Raspberry Pi
 
-#include "sidereal.h"
+#include "sidereal.h"	//Custom class for calculating time and angles
+
+#include <chrono>		//Used for testing
+#include <thread>		//Used for testing
 
 using std::cout;
 using std::endl;
@@ -68,38 +71,70 @@ int main(void)
 	gpioWrite(DIR2, PI_LOW);
 	gpioWrite(PUL2, PI_LOW);
 
-
 	//Custom coordinates 
 	degreeMinuteSeconds latitude;
 	latitude.degrees = 42;
 	latitude.minutes = 13;
-	latitude.seconds = 29.7048;
+	latitude.seconds = 29.53;
 
 	degreeMinuteSeconds longitude;
 	longitude.degrees = 121;
 	longitude.minutes = 46;
-	longitude.seconds = 51.4272;
+	longitude.seconds = 54.01;
 
+	//Converting coordinates from degree minute seconds to degrees decimal
 	double latitudeDeg = sidereal::dmsToDeg(latitude);
 	double longitudeDeg = sidereal::dmsToDeg(longitude);
 
 	while (1)
 	{
-		double deg = sidereal::getERA() *( 180 / M_PI);
-		double LMST = sidereal::getLMST(sidereal::getERA(), 121.781);
-		sidereal::getGMT();
+		//Get local sidereal time using getGMSTinRads() and longitude in degrees
+		double LMST = sidereal::getLMST(sidereal::getGMSTinRads(),-longitudeDeg);
+
+		//Status for console
+		cout << endl << endl;
 		cout << "Lat: " << latitudeDeg << " Long: " << longitudeDeg << endl;
 		cout << fixed << sidereal::getJulianDate() << endl;
-		cout << fixed << "ERA  = " << sidereal::getERA() << endl;
-		cout << fixed << "ERA  = " << sidereal::getERAcomplex() << " - complex" << endl;
-		cout << fixed << "GMST = " << sidereal::getGMSTinDEG() << " - degrees " << endl;
-		cout << fixed << "GMST = " << sidereal::getGMSTinRads() << " - rads" << endl;
-
+		cout << fixed << "GMST = " << sidereal::getGMSTinRads() << " (in Radians)" << endl;
 		cout << "LMST in Deg: " << LMST << endl;
 		cout << "LMST in HH:MM:SS: ";
-		sidereal::displayHHMMSS(sidereal::degToHms(LMST));
-		cout << "Sidereal Time: ";
-		sidereal::displayHHMMSS(sidereal::degToHms(deg));
+		sidereal::displayHHMMSS(sidereal::degToHms(LMST));	
+		
+		// Using time point and system_clock *******************************************************
+		std::chrono::time_point<std::chrono::system_clock> start, end;
+		start = std::chrono::system_clock::now();
+
+		sidereal::getERA();
+
+		//End timer
+		end = std::chrono::system_clock::now();
+		std::chrono::duration<float> elapsed_seconds = end - start;
+		std::cout << "getERA() elapsed time: " << std::fixed << elapsed_seconds.count() << "s\n";
+
+
+		// Using time point and system_clock *******************************************************
+		std::chrono::time_point<std::chrono::system_clock> start2, end2;
+		start2 = std::chrono::system_clock::now();
+
+		sidereal::getERAcomplex();
+
+		//End timer
+		end2 = std::chrono::system_clock::now();
+		std::chrono::duration<float> elapsed_seconds2 = end2 - start2;
+		std::cout << "getERAcomplex() elapsed time: " << std::fixed << elapsed_seconds2.count() << "s\n";
+
+
+		// Using time point and system_clock *******************************************************
+		std::chrono::time_point<std::chrono::system_clock> start3, end3;
+		start3 = std::chrono::system_clock::now();
+
+		sidereal::getGMSTinRads();
+
+		//End timer
+		end3 = std::chrono::system_clock::now();
+		std::chrono::duration<float> elapsed_seconds3 = end3 - start3;
+		std::cout << "getGMSTinRads() elapsed time: " << std::fixed << elapsed_seconds3.count() << "s\n";
+
 		////				Begin Back and forth loop				//
 		//for (int i = 0; i < 16000; i++)
 		//{
@@ -132,63 +167,63 @@ int main(void)
 
 		//				Begin Keyboard Directional Code				//
 		//Keyboard control:
-		char key = NULL;
+		//char key = NULL;
 
-		key = getchar();
-		switch (key)
-		{
-			//Up
-			case 'w':
-				gpioWrite(DIR2, PI_HIGH);
-				for (int i = 0; i < 1000; i++)
-				{
-					gpioWrite(PUL2, PI_HIGH);
-					gpioDelay(_DELAY);
-					gpioWrite(PUL2, PI_LOW);
-					gpioDelay(_DELAY);
-				}
-				break;
-					
-			//Down
-			case 's':
-				gpioWrite(DIR2, PI_LOW);
-				for (int i = 0; i < 1000; i++)
-				{
-					gpioWrite(PUL2, PI_HIGH);
-					gpioDelay(_DELAY);
-					gpioWrite(PUL2, PI_LOW);
-					gpioDelay(_DELAY);
-				}
-				break;
+		//key = getchar();
+		//switch (key)
+		//{
+		//	//Up
+		//	case 'w':
+		//		gpioWrite(DIR2, PI_HIGH);
+		//		for (int i = 0; i < 1000; i++)
+		//		{
+		//			gpioWrite(PUL2, PI_HIGH);
+		//			gpioDelay(_DELAY);
+		//			gpioWrite(PUL2, PI_LOW);
+		//			gpioDelay(_DELAY);
+		//		}
+		//		break;
+		//			
+		//	//Down
+		//	case 's':
+		//		gpioWrite(DIR2, PI_LOW);
+		//		for (int i = 0; i < 1000; i++)
+		//		{
+		//			gpioWrite(PUL2, PI_HIGH);
+		//			gpioDelay(_DELAY);
+		//			gpioWrite(PUL2, PI_LOW);
+		//			gpioDelay(_DELAY);
+		//		}
+		//		break;
 
-			//Left
-			case 'a':
-				gpioWrite(DIR1, PI_HIGH);
-				for (int i = 0; i < 1000; i++)
-				{
-					gpioWrite(PUL1, PI_HIGH);
-					gpioDelay(_DELAY);
-					gpioWrite(PUL1, PI_LOW);
-					gpioDelay(_DELAY);
-				}
-				break;
+		//	//Left
+		//	case 'a':
+		//		gpioWrite(DIR1, PI_HIGH);
+		//		for (int i = 0; i < 1000; i++)
+		//		{
+		//			gpioWrite(PUL1, PI_HIGH);
+		//			gpioDelay(_DELAY);
+		//			gpioWrite(PUL1, PI_LOW);
+		//			gpioDelay(_DELAY);
+		//		}
+		//		break;
 
-			//Right
-			case 'd':
-				gpioWrite(DIR1, PI_LOW);
-				for (int i = 0; i < 1000; i++)
-				{
-					gpioWrite(PUL1, PI_HIGH);
-					gpioDelay(_DELAY);
-					gpioWrite(PUL1, PI_LOW);
-					gpioDelay(_DELAY);
-				}
-				break;
-		}
+		//	//Right
+		//	case 'd':
+		//		gpioWrite(DIR1, PI_LOW);
+		//		for (int i = 0; i < 1000; i++)
+		//		{
+		//			gpioWrite(PUL1, PI_HIGH);
+		//			gpioDelay(_DELAY);
+		//			gpioWrite(PUL1, PI_LOW);
+		//			gpioDelay(_DELAY);
+		//		}
+		//		break;
+		//}
 
-		//Reset
-		key = NULL;
-		gpioDelay(_DELAY);
+		////Reset
+		//key = NULL;
+		//gpioDelay(_DELAY);
 
 		////			End Keyboard Directional Code				//
 
