@@ -94,7 +94,7 @@ int main(void)
 
 	twoAxisDeg latLong;
 	latLong.x = latitudeDeg;
-	latLong.y = longitudeDeg;
+	latLong.y = -longitudeDeg;
 
 	twoAxisDeg temp;
 	twoAxisDms AltAz;
@@ -105,14 +105,15 @@ int main(void)
 		double LMST = sidereal::getLMST(sidereal::getGMSTinRads(),-longitudeDeg);
 
 		//Status for console
-		cout << endl << endl;
+		//cout << endl << endl;
 		//cout << "Lat: " << latitudeDeg << " Long: " << longitudeDeg << endl;
 		//cout << fixed << sidereal::getJulianDate() << endl;
 		//cout << fixed << "GMST = " << sidereal::getGMSTinRads() << " (in Radians)" << endl;
 		//cout << "LMST in Deg: " << LMST << endl;
-		//cout << "LMST in HH:MM:SS: ";
-		//sidereal::displayHHMMSS(sidereal::degToHms(LMST));	
-		cout << "RA Deg input: " << RaDecInput.x << "Dec Deg input: " << RaDecInput.y << endl;
+
+		cout << "LMST: ";
+		sidereal::displayHHMMSS(sidereal::degToHms(LMST));	
+		cout << "RA Deg input: " << RaDecInput.x << " Dec Deg input: " << RaDecInput.y << endl;
 		cout << "Andromeda RA:  "; sidereal::displayHHMMSS(sidereal::degToHms(RaDecInput.x));
 		cout << "Andromeda Dec: "; sidereal::displayDms(sidereal::degToDms(RaDecInput.y));
 
@@ -121,8 +122,8 @@ int main(void)
 		AltAz.y = sidereal::degToDms(temp.y);
 
 		cout << "Calculation:  " << endl;
-		cout << "Alt: "; sidereal::displayDms(AltAz.x);
-		cout << "Az:  "; sidereal::displayDms(AltAz.y);
+		cout << "Alt deg: "; sidereal::displayDms(AltAz.x);
+		cout << "Az deg:  "; sidereal::displayDms(AltAz.y);
 
 		std::this_thread::sleep_for(std::chrono::seconds(1));
 		////				Begin Back and forth loop				//

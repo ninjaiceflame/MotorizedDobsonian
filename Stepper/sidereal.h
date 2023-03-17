@@ -2,7 +2,7 @@
 * Author:			Nathan Wiley
 * Filename:			sidereal.h
 * Date Created:		3/12/2023
-* Modifications:	3/116/2023
+* Modifications:	3/16/2023
 * Purpose:			Calculates local sidereal time
 **************************************************************/
 #pragma once

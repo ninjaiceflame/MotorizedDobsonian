@@ -41,7 +41,7 @@ void sidereal::displayDms(degreeMinuteSeconds timeInfo)
 ************************************************************************/
 double sidereal::hmsToDeg(hourMinuteSeconds timeInfo)
 {
-	return (timeInfo.hours * 15.0) + (timeInfo.minutes / 4.0)) + (timeInfo.seconds / 240.0);
+	return (timeInfo.hours * 15.0) + (timeInfo.minutes / 4.0) + (timeInfo.seconds / 240.0);
 }
 
 /**********************************************************************
