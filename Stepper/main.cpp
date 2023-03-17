@@ -89,8 +89,8 @@ int main(void)
 	
 	//Test with Amdromeda
 	twoAxisDeg RaDecInput;
-	RaDecInput.x = sidereal::hmsToDeg(0, 42, 42.72);
-	RaDecInput.y = sidereal::dmsToDeg(41, 16, 4.9);
+	RaDecInput.x = sidereal::hmsToDeg(0, 43, 58.12);
+	RaDecInput.y = sidereal::dmsToDeg(41, 23, 39.3);
 
 	twoAxisDeg latLong;
 	latLong.x = latitudeDeg;
@@ -117,11 +117,14 @@ int main(void)
 		cout << "Andromeda RA:  "; sidereal::displayHHMMSS(sidereal::degToHms(RaDecInput.x));
 		cout << "Andromeda Dec: "; sidereal::displayDms(sidereal::degToDms(RaDecInput.y));
 
-		temp = coordinate::equatorialToLocalJ2000(RaDecInput.x, RaDecInput.y, latLong);
+		temp = coordinate::equatorialToLocal(RaDecInput.x, RaDecInput.y, latLong);
 		AltAz.x = sidereal::degToDms(temp.x);
 		AltAz.y = sidereal::degToDms(temp.y);
 
+		double ha = LMST - RaDecInput.x;
+
 		cout << "Calculation:  " << endl;
+		cout << "Hour Angle = " << ha << " HMS: "; sidereal::displayHHMMSS(sidereal::degToHms(ha));
 		cout << "Alt deg: "; sidereal::displayDms(AltAz.x);
 		cout << "Az deg:  "; sidereal::displayDms(AltAz.y);
 

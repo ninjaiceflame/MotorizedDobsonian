@@ -59,6 +59,6 @@ typedef struct twoAxisDms
 class coordinate
 {
 	public:
-		static twoAxisDeg equatorialToLocalJ2000(double RA, double Dec, twoAxisDeg myPositionDeg);
+		static twoAxisDeg equatorialToLocal(double RA, double Dec, twoAxisDeg myPositionDeg);
 };
 

@@ -7,7 +7,7 @@
 **************************************************************/
 #include "coordinate.h"
 
-twoAxisDeg coordinate::equatorialToLocalJ2000(double Ra, double Dec, twoAxisDeg myPositionDeg)
+twoAxisDeg coordinate::equatorialToLocal(double Ra, double Dec, twoAxisDeg myPositionDeg)
 {
 	//Create struct for Alt/Az and Lat/Long
 	twoAxisDeg AltAz;
@@ -29,7 +29,7 @@ twoAxisDeg coordinate::equatorialToLocalJ2000(double Ra, double Dec, twoAxisDeg 
 	LMST = LMST*(M_PI / 180.0);
 
 	//Get Hour Angle from subtracting Right Ascension (RA) from Meridian (LMST)
-	double hourAngle = LMST - Ra;	
+	double hourAngle = LMST - RaDec.x;
 
 	//Quadrant correction math
 	if (hourAngle < 0)
@@ -42,9 +42,9 @@ twoAxisDeg coordinate::equatorialToLocalJ2000(double Ra, double Dec, twoAxisDeg 
 	}
 
 	//Set Azimuth
-	AltAz.y = (atan2( sin(hourAngle), cos(hourAngle) * sin(latLong.x) - tan(RaDec.y) * cos(latLong.x)));
+	AltAz.y = (atan2(sin(hourAngle), cos(hourAngle) * sin(latLong.x) - tan(RaDec.y) * cos(latLong.x)));
 	//Set Altitude
-	AltAz.x = (asin ( sin(latLong.x) * sin(RaDec.y) + cos(latLong.x) * cos(RaDec.y) * cos(hourAngle)));
+	AltAz.x = (asin(sin(latLong.x) * sin(RaDec.y) + cos(latLong.x) * cos(RaDec.y) * cos(hourAngle)));
 
 	
 	AltAz.y -= M_PI;
@@ -53,6 +53,9 @@ twoAxisDeg coordinate::equatorialToLocalJ2000(double Ra, double Dec, twoAxisDeg 
 	{
 		AltAz.y += 2 * M_PI;
 	}
+
+	AltAz.x = AltAz.x * (180 / M_PI);
+	AltAz.y = AltAz.y * (180 / M_PI);
 
 	return AltAz;
 }
