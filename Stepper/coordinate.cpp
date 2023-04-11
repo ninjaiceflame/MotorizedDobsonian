@@ -54,6 +54,7 @@ twoAxisDeg coordinate::equatorialToLocal(double Ra, double Dec, twoAxisDeg myPos
 		AltAz.y += 2 * M_PI;
 	}
 
+	//Convert to degrees decimal for output
 	AltAz.x = AltAz.x * (180 / M_PI);
 	AltAz.y = AltAz.y * (180 / M_PI);
 

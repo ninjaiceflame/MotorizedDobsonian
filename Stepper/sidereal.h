@@ -32,7 +32,7 @@ typedef struct degreeMinuteSeconds
 } degreeMinuteSeconds;
 
 /************************************************************************
-* Struct: 		degreeMinuteSeconds
+* Struct: 		hourMinuteSeconds
 * Purpose:		Holds data for hour minute seconds format. Ex. 23H 32M 14.23S
 * Data members:	hours	- Holds hours
 *				minutes	- Holds minutes
@@ -69,13 +69,14 @@ class sidereal
 
 		/*************************** Utility Functions ********************************/
 		static void displayTmMMDDYYYY(tm timeInfo);
+		static void displayHHMMSS(tm timeInfo);
 		static void displayHHMMSS(hourMinuteSeconds timeInfo);
 		static void displayDms(degreeMinuteSeconds timeInfo);
 		static double hmsToDeg(hourMinuteSeconds timeInfo);
 		static double hmsToDeg(double hours, double minutes, double seconds);
 		static hourMinuteSeconds degToHms(double deg);
-		static degreeMinuteSeconds degToDms(double deg); //Returns degreeMinuteSeconds struct after converting a degree
-		static double dmsToDeg(degreeMinuteSeconds dms); //Returns deouble degree after converting a degreeMinuteSecond struct
+		static degreeMinuteSeconds degToDms(double deg);						//Returns degreeMinuteSeconds struct after converting a degree
+		static double dmsToDeg(degreeMinuteSeconds dms);						//Returns deouble degree after converting a degreeMinuteSecond struct
 		static double dmsToDeg(double degrees, double minutes, double seconds);
 
 		/************************* Time and Date Getters ******************************/

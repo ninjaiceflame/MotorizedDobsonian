@@ -13,7 +13,7 @@
 
 /************************************************************************
 * Struct: 		twoAxisDeg
-* Purpose:		Holds data for 2 decimal degree values like latitude and longitude, RA / Dec, or Alt / Az
+* Purpose:		Holds data for 2, decimal degree values like latitude and longitude, RA / Dec, or Alt / Az
 * Data members:	x - Holds latitude, RA, or Alt
 *				y - Holds longitude, Dec, or Az
 *************************************************************************/
@@ -25,7 +25,7 @@ typedef struct twoAxisDeg
 
 /************************************************************************
 * Struct: 		twoAxisRads
-* Purpose:		Holds data for 2 radian values like latitude and longitude, RA / Dec, or Alt / Az
+* Purpose:		Holds data for 2, radian values like latitude and longitude, RA / Dec, or Alt / Az
 * Data members:	x - Holds latitude, RA, or Alt
 *				y - Holds longitude, Dec, or Az
 *************************************************************************/
@@ -38,7 +38,7 @@ typedef struct twoAxisRads
 
 /************************************************************************
 * Struct: 		twoAxisDms
-* Purpose:		Holds data for 2 degree minute seconds values like latitude and longitude, RA / Dec, or Alt / Az
+* Purpose:		Holds data for 2, degree minute seconds values like latitude and longitude, RA / Dec, or Alt / Az
 * Data members:	x - Holds latitude, RA, or Alt
 *				y - Holds longitude, Dec, or Az
 *************************************************************************/
@@ -50,7 +50,7 @@ typedef struct twoAxisDms
 
 /************************************************************************
 * Class: 		coordinate
-* Purpose:		Provide conversion between equatorial Right Ascension / Declination and local Altitude / Azimuth coordinates
+* Purpose:		Provide conversion from equatorial Right Ascension / Declination to local Altitude / Azimuth coordinates
 * Data members:	double Alt
 *				double Az
 * 

@@ -41,7 +41,7 @@ using std::fixed;
 int main(void)
 {
 	int stepsPerRev = _STEPS * _GEAR_RATIO;
-	// For back and forth loop: bool myBool = false;
+	bool myBool = false;
 	
 	//Initialise GPIO
 	gpioInitialise();
@@ -102,8 +102,8 @@ int main(void)
 	while (1)
 	{
 		//Get local sidereal time using getGMSTinRads() and longitude in degrees
-		double LMST = sidereal::getLMST(sidereal::getGMSTinRads(),-longitudeDeg);
-
+		//double LMST = sidereal::getLMST(sidereal::getGMSTinRads(),-longitudeDeg);
+		//cout << "Current Time (UTC/GMT): ";	sidereal::displayHHMMSS(sidereal::getGMT());
 		//Status for console
 		//cout << endl << endl;
 		//cout << "Lat: " << latitudeDeg << " Long: " << longitudeDeg << endl;
@@ -111,26 +111,26 @@ int main(void)
 		//cout << fixed << "GMST = " << sidereal::getGMSTinRads() << " (in Radians)" << endl;
 		//cout << "LMST in Deg: " << LMST << endl;
 
-		cout << "LMST: ";
-		sidereal::displayHHMMSS(sidereal::degToHms(LMST));	
-		cout << "RA Deg input: " << RaDecInput.x << " Dec Deg input: " << RaDecInput.y << endl;
-		cout << "Andromeda RA:  "; sidereal::displayHHMMSS(sidereal::degToHms(RaDecInput.x));
-		cout << "Andromeda Dec: "; sidereal::displayDms(sidereal::degToDms(RaDecInput.y));
+		//cout << "LMST: ";
+		//sidereal::displayHHMMSS(sidereal::degToHms(LMST));	
+		//cout << "RA Deg input: " << RaDecInput.x << " Dec Deg input: " << RaDecInput.y << endl;
+		//cout << "Andromeda RA:  "; sidereal::displayHHMMSS(sidereal::degToHms(RaDecInput.x));
+		//cout << "Andromeda Dec: "; sidereal::displayDms(sidereal::degToDms(RaDecInput.y));
 
-		temp = coordinate::equatorialToLocal(RaDecInput.x, RaDecInput.y, latLong);
-		AltAz.x = sidereal::degToDms(temp.x);
-		AltAz.y = sidereal::degToDms(temp.y);
+		//temp = coordinate::equatorialToLocal(RaDecInput.x, RaDecInput.y, latLong);
+		//AltAz.x = sidereal::degToDms(temp.x);
+		//AltAz.y = sidereal::degToDms(temp.y);
 
-		double ha = LMST - RaDecInput.x;
+		//double ha = LMST - RaDecInput.x;
 
-		cout << "Calculation:  " << endl;
-		cout << "Hour Angle = " << ha << " HMS: "; sidereal::displayHHMMSS(sidereal::degToHms(ha));
-		cout << "Alt deg: "; sidereal::displayDms(AltAz.x);
-		cout << "Az deg:  "; sidereal::displayDms(AltAz.y);
+		//cout << "Calculation:  " << endl;
+		//cout << "Hour Angle = " << ha << " HMS: "; sidereal::displayHHMMSS(sidereal::degToHms(ha));
+		//cout << "Alt deg: "; sidereal::displayDms(AltAz.x);
+		//cout << "Az deg:  "; sidereal::displayDms(AltAz.y);
 
-		std::this_thread::sleep_for(std::chrono::seconds(1));
+		//std::this_thread::sleep_for(std::chrono::seconds(1));
 		////				Begin Back and forth loop				//
-		//for (int i = 0; i < 16000; i++)
+		//for (int i = 0; i < 32000; i++)
 		//{
 		//	cout << "stepping" << endl;
 		//	gpioWrite(PUL1, PI_HIGH);
@@ -161,63 +161,63 @@ int main(void)
 
 		//				Begin Keyboard Directional Code				//
 		//Keyboard control:
-		//char key = NULL;
+		char key = NULL;
 
-		//key = getchar();
-		//switch (key)
-		//{
-		//	//Up
-		//	case 'w':
-		//		gpioWrite(DIR2, PI_HIGH);
-		//		for (int i = 0; i < 1000; i++)
-		//		{
-		//			gpioWrite(PUL2, PI_HIGH);
-		//			gpioDelay(_DELAY);
-		//			gpioWrite(PUL2, PI_LOW);
-		//			gpioDelay(_DELAY);
-		//		}
-		//		break;
-		//			
-		//	//Down
-		//	case 's':
-		//		gpioWrite(DIR2, PI_LOW);
-		//		for (int i = 0; i < 1000; i++)
-		//		{
-		//			gpioWrite(PUL2, PI_HIGH);
-		//			gpioDelay(_DELAY);
-		//			gpioWrite(PUL2, PI_LOW);
-		//			gpioDelay(_DELAY);
-		//		}
-		//		break;
+		key = getchar();
+		switch (key)
+		{
+			//Up
+			case 'w':
+				gpioWrite(DIR2, PI_HIGH);
+				for (int i = 0; i < 1000; i++)
+				{
+					gpioWrite(PUL2, PI_HIGH);
+					gpioDelay(_DELAY);
+					gpioWrite(PUL2, PI_LOW);
+					gpioDelay(_DELAY);
+				}
+				break;
+					
+			//Down
+			case 's':
+				gpioWrite(DIR2, PI_LOW);
+				for (int i = 0; i < 1000; i++)
+				{
+					gpioWrite(PUL2, PI_HIGH);
+					gpioDelay(_DELAY);
+					gpioWrite(PUL2, PI_LOW);
+					gpioDelay(_DELAY);
+				}
+				break;
 
-		//	//Left
-		//	case 'a':
-		//		gpioWrite(DIR1, PI_HIGH);
-		//		for (int i = 0; i < 1000; i++)
-		//		{
-		//			gpioWrite(PUL1, PI_HIGH);
-		//			gpioDelay(_DELAY);
-		//			gpioWrite(PUL1, PI_LOW);
-		//			gpioDelay(_DELAY);
-		//		}
-		//		break;
+			//Left
+			case 'a':
+				gpioWrite(DIR1, PI_HIGH);
+				for (int i = 0; i < 1000; i++)
+				{
+					gpioWrite(PUL1, PI_HIGH);
+					gpioDelay(_DELAY);
+					gpioWrite(PUL1, PI_LOW);
+					gpioDelay(_DELAY);
+				}
+				break;
 
-		//	//Right
-		//	case 'd':
-		//		gpioWrite(DIR1, PI_LOW);
-		//		for (int i = 0; i < 1000; i++)
-		//		{
-		//			gpioWrite(PUL1, PI_HIGH);
-		//			gpioDelay(_DELAY);
-		//			gpioWrite(PUL1, PI_LOW);
-		//			gpioDelay(_DELAY);
-		//		}
-		//		break;
-		//}
+			//Right
+			case 'd':
+				gpioWrite(DIR1, PI_LOW);
+				for (int i = 0; i < 1000; i++)
+				{
+					gpioWrite(PUL1, PI_HIGH);
+					gpioDelay(_DELAY);
+					gpioWrite(PUL1, PI_LOW);
+					gpioDelay(_DELAY);
+				}
+				break;
+		}
 
-		////Reset
-		//key = NULL;
-		//gpioDelay(_DELAY);
+		//Reset
+		key = NULL;
+		gpioDelay(_DELAY);
 
 		////			End Keyboard Directional Code				//
 

@@ -23,6 +23,17 @@ void sidereal::displayTmMMDDYYYY(tm timeInfo)
 * Precondition:		Pass in an initialized tm struct to timeInfo
 * Postcondition:	Hours, minutes, and seconds are printed out to console on a separate line
 ************************************************************************/
+void sidereal::displayHHMMSS(tm timeInfo)
+{
+	cout << "H:" << timeInfo.tm_hour << " M:" << timeInfo.tm_min << " S:" << timeInfo.tm_sec << endl;
+}
+
+/**********************************************************************
+* Function:			displayHHMMSS
+* Purpose: 			Provide an easy way to print tm structs hour, minute, and second to console
+* Precondition:		Pass in an initialized tm struct to timeInfo
+* Postcondition:	Hours, minutes, and seconds are printed out to console on a separate line
+************************************************************************/
 void sidereal::displayHHMMSS(hourMinuteSeconds timeInfo)
 {
 	cout << "H:" << timeInfo.hours << " M:" << timeInfo.minutes << " S:" << timeInfo.seconds << endl;
@@ -145,14 +156,14 @@ tm sidereal::getGMT()
 					When using getERA(), Approx 1m 13s behind https://www.localsiderealtime.com/
 					When using getERA(), Approx 1m 30s behind stellarium
 					When using getGMSTinRads(), precisely in time with https://www.localsiderealtime.com/ using -121.7817 longitude
-					When using getGMSTinRads(), precisely in time with stellarium "Apparant Sidereal Time" using -121.7817 longitude
+					When using getGMSTinRads(), precisely in time with stellarium "Apparent Sidereal Time" using -121.7817 longitude
 ************************************************************************/
 double sidereal::getLMST(double rads, double longitudeEast)
 {
 	double LMST;
-
-	//Correct if negative
+	//Convert rads to degrees and offsets based on longitude
 	LMST = ((rads * 180) / M_PI + longitudeEast);
+	//Correct if negative
 	if (LMST < 0)
 	{
 		LMST += 360.0;
