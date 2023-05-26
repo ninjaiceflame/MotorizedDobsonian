@@ -43,7 +43,7 @@ int main(void)
 	int stepsPerRev = _STEPS * _GEAR_RATIO;
 	bool myBool = false;
 	
-	//Initialise GPIO
+	//Initialize GPIO
 	gpioInitialise();
 
 	//Set up GPIO pins for stepper motor
@@ -277,30 +277,6 @@ int main(void)
 		//}
 		//				End Controller Code							//
 	}
-
-	//Code for calibration
-	//bool calibrated = false;
-	//bool horizontally_calibrated = false;
-	//bool vertically_calibrated = false;
-
-	//while(!calibrated)
-	//{ 
-	//	//Subtract horizontal
-	//	if (!horizontally_calibrated)
-	//	{
-	//		//gpioWrite(PUL1, PI_HIGH);
-	//		//gpioDelay(_DELAY);
-	//	}
-
-	//	//Subtract vertical
-	//	if (!vertically_calibrated)
-	//	{
-
-	//	}
-	//}
-
-
-	//Psuedocode for controller demo
 
 	gpioTerminate();
 	return 0;

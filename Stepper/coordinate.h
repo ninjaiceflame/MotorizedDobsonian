@@ -11,6 +11,8 @@
 #include <cmath>		//atan2()
 #include "sidereal.h"	//degree and hour minute second structs, getLMST()
 
+using std::cin;
+
 /************************************************************************
 * Struct: 		twoAxisDeg
 * Purpose:		Holds data for 2, decimal degree values like latitude and longitude, RA / Dec, or Alt / Az
@@ -60,5 +62,13 @@ class coordinate
 {
 	public:
 		static twoAxisDeg equatorialToLocal(double RA, double Dec, twoAxisDeg myPositionDeg);
+		static void calibrate();
+		static void manualControl();
+		static void gotoCoordsDeg();
+
+	private:
+		static twoAxisDeg currentCelestialPosDeg;
+		static twoAxisDeg currentLocalPosDeg;
+		static twoAxisDeg currentLatLongDeg;
 };
 

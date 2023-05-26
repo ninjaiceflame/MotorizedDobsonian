@@ -7,6 +7,13 @@
 **************************************************************/
 #include "coordinate.h"
 
+/**********************************************************************
+* Function:			equatorialToLocal
+* Purpose: 			Converts Equatorial / Celestial coordinates (RA, Dec) to Local (Alt, Az) coordinates.
+* Precondition:		Pass in Right Ascention to RA and Declination to Dec as a doubles containing degrees.
+*					Pass in twoAxisDeg holding Latitute and Longitude as degrees
+* Postcondition:	An instance of twoAxisDeg is returned containing the Alt/Az coordinates of the target in degrees.
+************************************************************************/
 twoAxisDeg coordinate::equatorialToLocal(double Ra, double Dec, twoAxisDeg myPositionDeg)
 {
 	//Create struct for Alt/Az and Lat/Long
@@ -59,4 +66,65 @@ twoAxisDeg coordinate::equatorialToLocal(double Ra, double Dec, twoAxisDeg myPos
 	AltAz.y = AltAz.y * (180 / M_PI);
 
 	return AltAz;
+}
+ 
+
+/**********************************************************************
+* Function:			calibrate
+* Purpose: 			Aligns coordinates when given target
+* Precondition:		Telescope must be level and pointed at object using manualControl() to work
+* Postcondition:	The Coordinate class will know where the telescope is pointed, and can now point to another target
+************************************************************************/
+void coordinate::calibrate()
+{
+	hourMinuteSeconds RA;
+	degreeMinuteSeconds Dec;
+
+	degreeMinuteSeconds Lat;
+	degreeMinuteSeconds Long;
+
+	//No input error checking yet
+	cout << "\n\nEnter calibration target RA in HMS:\nHour: ";
+	cin >> RA.hours;
+	cout << "\nMinutes: ";
+	cin >> RA.minutes;
+	cout << "\nSeconds: ";
+	cin >> RA.seconds;
+
+	cout << "\n\nEnter calibration target Dec in DMS:\nDegrees: ";
+	cin >> Dec.degrees;
+	cout << "\nMinutes: ";
+	cin >> Dec.minutes;
+	cout << "\nSeconds: ";
+	cin >> Dec.seconds;
+
+	cout << "\n\nEnter Latitude in DMS:\nDegrees: ";
+	cin >> Lat.degrees;
+	cout << "\nMinutes: ";
+	cin >> Lat.minutes;
+	cout << "\nSeconds: ";
+	cin >> Lat.seconds;
+
+	cout << "\n\nEnter Longitude in DMS:\nDegrees: ";
+	cin >> Long.degrees;
+	cout << "\nMinutes: ";
+	cin >> Long.minutes;
+	cout << "\nSeconds: ";
+	cin >> Long.seconds;
+
+	//Store the RA/Dec coordinates
+	currentCelestialPosDeg.x = sidereal::hmsToDeg(RA);
+	currentCelestialPosDeg.y = sidereal::dmsToDeg(Dec);
+
+	//Store the Lat/Long coordinates
+	currentLatLongDeg.x = sidereal::dmsToDeg(Lat);
+	currentLatLongDeg.y = sidereal::dmsToDeg(Long);
+
+	//Store the Alt/Az coordinates
+	currentLocalPosDeg = equatorialToLocal(currentCelestialPosDeg.x, currentCelestialPosDeg.y, currentLatLongDeg);
+}
+
+void coordinate::manualControl()
+{
+
 }
