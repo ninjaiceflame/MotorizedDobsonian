@@ -128,3 +128,160 @@ void coordinate::manualControl()
 {
 
 }
+
+void coordinate::gotoCoordsDeg(twoAxisDeg targetRaDec)
+{
+	//Convert Ra Dec to Alt Az
+	twoAxisDeg targetLocalPosDeg = coordinate::equatorialToLocal(targetRaDec.x, targetRaDec.y, currentLatLongDeg);
+	
+	//Find slope to target
+	double slope = (targetLocalPosDeg.y - currentLocalPosDeg.y) / (targetLocalPosDeg.x - currentLocalPosDeg.x);
+	double xToMove = targetLocalPosDeg.x - currentLocalPosDeg.x;
+	double yToMove = targetLocalPosDeg.y - currentLocalPosDeg.y;
+
+	while (1)
+	{
+		//If the x degrees to move is more than a step size in degrees
+		if (abs(xToMove) >= (_STEP_SIZE))
+		{
+			//0 to 360 degrees, 0 = North, 90 = East, 180 = South, 270 = West
+			
+			//Step if positive AND not out of bounds
+			if (xToMove > 0 && targetLocalPosDeg.x < 360)
+			{
+				coordinate::stepRight();
+				currentLocalPosDeg.x += _STEP_SIZE;
+			}
+			//Step if negative AND not out of bounds
+			if (xToMove < 0 && targetLocalPosDeg.x > 0)
+			{
+				coordinate::stepLeft();
+				currentLocalPosDeg.x -= _STEP_SIZE;
+			}
+		}
+
+		//If the y degrees to move is more than a step size in degrees
+		if (abs(yToMove) >= (_STEP_SIZE))
+		{
+			//0 to 90 degrees, 0 = Horizontal, 90 = Vertical, anything > 90 or < 0 is ignored
+			// 
+			//Step if positive
+			if (yToMove > 0 && targetLocalPosDeg.y < 90)
+			{
+				coordinate::stepUp();
+				currentLocalPosDeg.y += _STEP_SIZE;
+			}
+			//Step if negative
+			if (yToMove < 0 && targetLocalPosDeg.y > 0)
+			{
+				coordinate::stepDown();
+				currentLocalPosDeg.y -= _STEP_SIZE;
+			}
+		}
+		//Update target Alt Az
+		targetLocalPosDeg = coordinate::equatorialToLocal(targetRaDec.x, targetRaDec.y, currentLatLongDeg);
+	}
+
+
+	//Step
+	//char key = NULL;
+
+	//key = getchar();
+	//switch (key)
+	//{
+	//	//Up
+	//case 'w':
+	//	gpioWrite(DIR2, PI_HIGH);
+	//	for (int i = 0; i < 1000; i++)
+	//	{
+	//		gpioWrite(PUL2, PI_HIGH);
+	//		gpioDelay(_DELAY);
+	//		gpioWrite(PUL2, PI_LOW);
+	//		gpioDelay(_DELAY);
+	//	}
+	//	break;
+
+	//	//Down
+	//case 's':
+	//	gpioWrite(DIR2, PI_LOW);
+	//	for (int i = 0; i < 1000; i++)
+	//	{
+	//		gpioWrite(PUL2, PI_HIGH);
+	//		gpioDelay(_DELAY);
+	//		gpioWrite(PUL2, PI_LOW);
+	//		gpioDelay(_DELAY);
+	//	}
+	//	break;
+
+	//	//Left
+	//case 'a':
+	//	gpioWrite(DIR1, PI_HIGH);
+	//	for (int i = 0; i < 1000; i++)
+	//	{
+	//		gpioWrite(PUL1, PI_HIGH);
+	//		gpioDelay(_DELAY);
+	//		gpioWrite(PUL1, PI_LOW);
+	//		gpioDelay(_DELAY);
+	//	}
+	//	break;
+
+	//	//Right
+	//case 'd':
+	//	gpioWrite(DIR1, PI_LOW);
+	//	for (int i = 0; i < 1000; i++)
+	//	{
+	//		gpioWrite(PUL1, PI_HIGH);
+	//		gpioDelay(_DELAY);
+	//		gpioWrite(PUL1, PI_LOW);
+	//		gpioDelay(_DELAY);
+	//	}
+	//	break;
+	//}
+
+	////Reset
+	//key = NULL;
+	//gpioDelay(_DELAY);
+
+}
+
+void coordinate::stepRight()
+{	//Set direction
+	gpioWrite(DIR1, PI_HIGH);
+	//Step
+	gpioWrite(PUL1, PI_HIGH);
+	gpioDelay(_DELAY);
+	gpioWrite(PUL1, PI_LOW);
+	gpioDelay(_DELAY);
+}
+
+void coordinate::stepLeft()
+{	//Set direction
+	gpioWrite(DIR1, PI_LOW);
+	//Step 
+	gpioWrite(PUL1, PI_HIGH);
+	gpioDelay(_DELAY);
+	gpioWrite(PUL1, PI_LOW);
+	gpioDelay(_DELAY);
+}
+
+void coordinate::stepUp()
+{		
+	//Set direction
+	gpioWrite(DIR2, PI_HIGH);
+	//Step
+	gpioWrite(PUL2, PI_HIGH);
+	gpioDelay(_DELAY);
+	gpioWrite(PUL2, PI_LOW);
+	gpioDelay(_DELAY);
+}
+
+void coordinate::stepDown()
+{
+	//Set direction
+	gpioWrite(DIR2, PI_LOW);
+	//Step
+	gpioWrite(PUL2, PI_HIGH);
+	gpioDelay(_DELAY);
+	gpioWrite(PUL2, PI_LOW);
+	gpioDelay(_DELAY);
+}

@@ -30,8 +30,9 @@ using std::fixed;
 //#define _DELAY 64
 #define _DELAY 100
 #define _STEPS 1600
-#define _GEAR_RATIO 100 * 2
-
+#define _GEAR_RATIO 100 * 2 * 2.5
+#define _STEPRESOLUTION _STEPS * _GEAR_RATIO
+#define _STEPSIZE 1/_STEPRESOLUTION
 //Controller pins
 #define D_BTN 5
 #define C_BTN 6
