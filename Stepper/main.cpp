@@ -30,7 +30,7 @@ using std::fixed;
 //#define _DELAY 64
 #define _DELAY 100
 #define _STEPS 1600
-#define _GEAR_RATIO 100 * 2 * 2.5
+#define _GEAR_RATIO 100 * 2.5
 #define _STEPRESOLUTION _STEPS * _GEAR_RATIO
 #define _STEPSIZE 1/_STEPRESOLUTION
 //Controller pins
@@ -88,10 +88,10 @@ int main(void)
 	double latitudeDeg = sidereal::dmsToDeg(latitude);
 	double longitudeDeg = sidereal::dmsToDeg(longitude);
 	
-	//Test with Amdromeda
+	//Test with moon
 	twoAxisDeg RaDecInput;
-	RaDecInput.x = sidereal::hmsToDeg(0, 43, 58.12);
-	RaDecInput.y = sidereal::dmsToDeg(41, 23, 39.3);
+	RaDecInput.x = sidereal::hmsToDeg(14, 50, 50);
+	RaDecInput.y = sidereal::dmsToDeg(-18, 36, 33.9);
 
 	twoAxisDeg latLong;
 	latLong.x = latitudeDeg;
@@ -100,12 +100,16 @@ int main(void)
 	twoAxisDeg temp;
 	twoAxisDms AltAz;
 
+	coordinate telescope;
 	while (1)
 	{
+		telescope.manualControl();
+		telescope.calibrate(latLong);
+		telescope.gotoCoordsDeg(RaDecInput);
 		//Get local sidereal time using getGMSTinRads() and longitude in degrees
 		//double LMST = sidereal::getLMST(sidereal::getGMSTinRads(),-longitudeDeg);
 		//cout << "Current Time (UTC/GMT): ";	sidereal::displayHHMMSS(sidereal::getGMT());
-		//Status for console
+		////Status for console
 		//cout << endl << endl;
 		//cout << "Lat: " << latitudeDeg << " Long: " << longitudeDeg << endl;
 		//cout << fixed << sidereal::getJulianDate() << endl;
@@ -115,112 +119,17 @@ int main(void)
 		//cout << "LMST: ";
 		//sidereal::displayHHMMSS(sidereal::degToHms(LMST));	
 		//cout << "RA Deg input: " << RaDecInput.x << " Dec Deg input: " << RaDecInput.y << endl;
-		//cout << "Andromeda RA:  "; sidereal::displayHHMMSS(sidereal::degToHms(RaDecInput.x));
-		//cout << "Andromeda Dec: "; sidereal::displayDms(sidereal::degToDms(RaDecInput.y));
+		//cout << "Moon RA:  "; sidereal::displayHHMMSS(sidereal::degToHms(RaDecInput.x));
+		//cout << "Moon Dec: "; sidereal::displayDms(sidereal::degToDms(RaDecInput.y));
 
 		//temp = coordinate::equatorialToLocal(RaDecInput.x, RaDecInput.y, latLong);
 		//AltAz.x = sidereal::degToDms(temp.x);
 		//AltAz.y = sidereal::degToDms(temp.y);
+		//cout << "Alt: " << temp.x << " Az: " << temp.y << endl;
 
 		//double ha = LMST - RaDecInput.x;
 
-		//cout << "Calculation:  " << endl;
-		//cout << "Hour Angle = " << ha << " HMS: "; sidereal::displayHHMMSS(sidereal::degToHms(ha));
-		//cout << "Alt deg: "; sidereal::displayDms(AltAz.x);
-		//cout << "Az deg:  "; sidereal::displayDms(AltAz.y);
 
-		//std::this_thread::sleep_for(std::chrono::seconds(1));
-		////				Begin Back and forth loop				//
-		//for (int i = 0; i < 32000; i++)
-		//{
-		//	cout << "stepping" << endl;
-		//	gpioWrite(PUL1, PI_HIGH);
-		//	gpioWrite(PUL2, PI_HIGH);
-		//	gpioDelay(_DELAY);
-		//	gpioWrite(PUL1, PI_LOW);
-		//	gpioWrite(PUL2, PI_LOW);
-		//	gpioDelay(_DELAY);
-		//}
-		//
-		////Switch Directions
-		//if (myBool == false)
-		//{
-		//	
-		//	gpioWrite(DIR1, PI_HIGH);
-		//	gpioWrite(DIR2, PI_HIGH);
-		//}
-		//else
-		//{
-		//	gpioWrite(DIR1, PI_LOW);
-		//	gpioWrite(DIR2, PI_LOW);
-		//}
-		//cout << "switching directions = " << myBool << endl;
-		//myBool = !myBool;
-		////				End Back and Forth Loop					//
-
-	
-
-		//				Begin Keyboard Directional Code				//
-		//Keyboard control:
-		char key = NULL;
-
-		key = getchar();
-		switch (key)
-		{
-			//Up
-			case 'w':
-				gpioWrite(DIR2, PI_HIGH);
-				for (int i = 0; i < 1000; i++)
-				{
-					gpioWrite(PUL2, PI_HIGH);
-					gpioDelay(_DELAY);
-					gpioWrite(PUL2, PI_LOW);
-					gpioDelay(_DELAY);
-				}
-				break;
-					
-			//Down
-			case 's':
-				gpioWrite(DIR2, PI_LOW);
-				for (int i = 0; i < 1000; i++)
-				{
-					gpioWrite(PUL2, PI_HIGH);
-					gpioDelay(_DELAY);
-					gpioWrite(PUL2, PI_LOW);
-					gpioDelay(_DELAY);
-				}
-				break;
-
-			//Left
-			case 'a':
-				gpioWrite(DIR1, PI_HIGH);
-				for (int i = 0; i < 1000; i++)
-				{
-					gpioWrite(PUL1, PI_HIGH);
-					gpioDelay(_DELAY);
-					gpioWrite(PUL1, PI_LOW);
-					gpioDelay(_DELAY);
-				}
-				break;
-
-			//Right
-			case 'd':
-				gpioWrite(DIR1, PI_LOW);
-				for (int i = 0; i < 1000; i++)
-				{
-					gpioWrite(PUL1, PI_HIGH);
-					gpioDelay(_DELAY);
-					gpioWrite(PUL1, PI_LOW);
-					gpioDelay(_DELAY);
-				}
-				break;
-		}
-
-		//Reset
-		key = NULL;
-		gpioDelay(_DELAY);
-
-		////			End Keyboard Directional Code				//
 
 		//				Begin Controller Code						//
 

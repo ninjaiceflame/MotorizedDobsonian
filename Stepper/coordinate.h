@@ -20,7 +20,7 @@
 //#define _DELAY 64
 #define _DELAY 100
 #define _STEPS 1600
-#define _GEAR_RATIO 100 * 2 * 2.5
+#define _GEAR_RATIO 100 * 2.5
 #define _STEP_RESOLUTION _STEPS * _GEAR_RATIO
 #define _STEP_SIZE 1/_STEP_RESOLUTION
 //Controller pins
@@ -32,6 +32,7 @@
 #include <math.h>		//M_PI
 #include <cmath>		//atan2()
 #include "sidereal.h"	//degree and hour minute second structs, getLMST()
+#include <pigpio.h>		//gpio access for Raspberry Pi
 
 using std::cin;
 
@@ -83,17 +84,17 @@ typedef struct twoAxisDms
 class coordinate
 {
 	public:
-		static twoAxisDeg equatorialToLocal(double RA, double Dec, twoAxisDeg myPositionDeg);
-		static void calibrate();
-		static void manualControl();
-		static void gotoCoordsDeg(twoAxisDeg targetRaDec);
-		static void stepRight();
-		static void stepLeft();
-		static void stepUp();
-		static void stepDown();
+		twoAxisDeg equatorialToLocal(double RA, double Dec, twoAxisDeg myPositionDeg);
+		void calibrate(twoAxisDeg latLong);
+		void manualControl();
+		void gotoCoordsDeg(twoAxisDeg targetRaDec);
+		void stepRight();
+		void stepLeft();
+		void stepUp();
+		void stepDown();
 	private:
-		static twoAxisDeg currentCelestialPosDeg;
-		static twoAxisDeg currentLocalPosDeg;
-		static twoAxisDeg currentLatLongDeg;
+		twoAxisDeg currentCelestialPosDeg;
+		twoAxisDeg currentAltAz;
+		twoAxisDeg currentLatLongDeg;
 };
 

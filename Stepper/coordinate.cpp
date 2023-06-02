@@ -75,30 +75,30 @@ twoAxisDeg coordinate::equatorialToLocal(double Ra, double Dec, twoAxisDeg myPos
 * Precondition:		Telescope must be level and pointed at object using manualControl() to work
 * Postcondition:	The Coordinate class will know where the telescope is pointed, and can now point to another target
 ************************************************************************/
-void coordinate::calibrate()
+void coordinate::calibrate(twoAxisDeg latLong)
 {
-	hourMinuteSeconds RA;
-	degreeMinuteSeconds Dec;
+	//hourMinuteSeconds RA;
+	//degreeMinuteSeconds Dec;
 
-	degreeMinuteSeconds Lat;
-	degreeMinuteSeconds Long;
+	//degreeMinuteSeconds Lat;
+	//degreeMinuteSeconds Long;
 
-	//No input error checking yet
-	cout << "\n\nEnter calibration target RA in HMS:\nHour: ";
-	cin >> RA.hours;
-	cout << "\nMinutes: ";
-	cin >> RA.minutes;
-	cout << "\nSeconds: ";
-	cin >> RA.seconds;
+	////No input error checking yet
+	//cout << "\n\nEnter calibration target RA in HMS:\nHour: ";
+	//cin >> RA.hours;
+	//cout << "\nMinutes: ";
+	//cin >> RA.minutes;
+	//cout << "\nSeconds: ";
+	//cin >> RA.seconds;
 
-	cout << "\n\nEnter calibration target Dec in DMS:\nDegrees: ";
-	cin >> Dec.degrees;
-	cout << "\nMinutes: ";
-	cin >> Dec.minutes;
-	cout << "\nSeconds: ";
-	cin >> Dec.seconds;
+	//cout << "\n\nEnter calibration target Dec in DMS:\nDegrees: ";
+	//cin >> Dec.degrees;
+	//cout << "\nMinutes: ";
+	//cin >> Dec.minutes;
+	//cout << "\nSeconds: ";
+	//cin >> Dec.seconds;
 
-	cout << "\n\nEnter Latitude in DMS:\nDegrees: ";
+	/*cout << "\n\nEnter Latitude in DMS:\nDegrees: ";
 	cin >> Lat.degrees;
 	cout << "\nMinutes: ";
 	cin >> Lat.minutes;
@@ -110,76 +110,137 @@ void coordinate::calibrate()
 	cout << "\nMinutes: ";
 	cin >> Long.minutes;
 	cout << "\nSeconds: ";
-	cin >> Long.seconds;
+	cin >> Long.seconds;*/
+
+	//Test with north coordinate 6/1/2023
+	twoAxisDeg RaDecInput;
+	RaDecInput.x = sidereal::hmsToDeg(1, 23, 14.6);
+	RaDecInput.y = sidereal::dmsToDeg(50, 14, 23.3);
 
 	//Store the RA/Dec coordinates
-	currentCelestialPosDeg.x = sidereal::hmsToDeg(RA);
-	currentCelestialPosDeg.y = sidereal::dmsToDeg(Dec);
+	/*currentCelestialPosDeg.x = sidereal::hmsToDeg(RA);
+	currentCelestialPosDeg.y = sidereal::dmsToDeg(Dec);*/
 
 	//Store the Lat/Long coordinates
-	currentLatLongDeg.x = sidereal::dmsToDeg(Lat);
-	currentLatLongDeg.y = sidereal::dmsToDeg(Long);
-
+	//currentLatLongDeg.x = sidereal::dmsToDeg(latLong.x);
+	//currentLatLongDeg.y = sidereal::dmsToDeg(latLong.y);
+	currentLatLongDeg.x = latLong.x;
+	currentLatLongDeg.y = latLong.y;
 	//Store the Alt/Az coordinates
-	currentLocalPosDeg = equatorialToLocal(currentCelestialPosDeg.x, currentCelestialPosDeg.y, currentLatLongDeg);
+	currentAltAz = equatorialToLocal(RaDecInput.x, RaDecInput.y, latLong);
+
+	int x = 0;
 }
 
 void coordinate::manualControl()
 {
+	//Keyboard control:
+	char key = NULL;
+	while (1)
+	{
+		key = getchar();
+		switch (key)
+		{
+			//Up
+		case 'w':
+			
+			for (int i = 0; i < 1000; i++)
+			{
+				stepUp();
+			}
+			break;
+
+			//Down
+		case 's':
+			for (int i = 0; i < 1000; i++)
+			{
+				stepDown();
+			}
+			break;
+
+			//Left
+		case 'a':
+			for (int i = 0; i < 1000; i++)
+			{
+				stepLeft();
+			}
+			break;
+
+			//Right
+		case 'd':
+			for (int i = 0; i < 1000; i++)
+			{
+				stepRight();
+			}
+			break;
+
+		case 'x':
+			return;
+		}
+
+		//Reset
+		key = NULL;
+		gpioDelay(_DELAY);
+	}
 
 }
 
 void coordinate::gotoCoordsDeg(twoAxisDeg targetRaDec)
 {
 	//Convert Ra Dec to Alt Az
-	twoAxisDeg targetLocalPosDeg = coordinate::equatorialToLocal(targetRaDec.x, targetRaDec.y, currentLatLongDeg);
+	twoAxisDeg targetAltAz = equatorialToLocal(targetRaDec.x, targetRaDec.y, currentLatLongDeg);
 	
-	//Find slope to target
-	double slope = (targetLocalPosDeg.y - currentLocalPosDeg.y) / (targetLocalPosDeg.x - currentLocalPosDeg.x);
-	double xToMove = targetLocalPosDeg.x - currentLocalPosDeg.x;
-	double yToMove = targetLocalPosDeg.y - currentLocalPosDeg.y;
+	double xToMove = targetAltAz.x - currentAltAz.x;
+	double yToMove = targetAltAz.y - currentAltAz.y;
 
+	double gear_ratio = 100 * 2.5;
+	double step_resolution = _STEPS * gear_ratio;
+
+	double step_size = 360 / step_resolution;
 	while (1)
 	{
-		//If the x degrees to move is more than a step size in degrees
-		if (abs(xToMove) >= (_STEP_SIZE))
+		//If the y degrees to move is more than a step size in degrees
+		if (abs(yToMove) >= (step_size))
 		{
 			//0 to 360 degrees, 0 = North, 90 = East, 180 = South, 270 = West
 			
 			//Step if positive AND not out of bounds
-			if (xToMove > 0 && targetLocalPosDeg.x < 360)
+			if (yToMove > 0 && targetAltAz.y < 360)
 			{
 				coordinate::stepRight();
-				currentLocalPosDeg.x += _STEP_SIZE;
+				currentAltAz.y += step_size;
 			}
 			//Step if negative AND not out of bounds
-			if (xToMove < 0 && targetLocalPosDeg.x > 0)
+			if (yToMove < 0 && targetAltAz.y > 0)
 			{
 				coordinate::stepLeft();
-				currentLocalPosDeg.x -= _STEP_SIZE;
+				currentAltAz.y -= step_size;
 			}
 		}
 
-		//If the y degrees to move is more than a step size in degrees
-		if (abs(yToMove) >= (_STEP_SIZE))
+		//If the x degrees to move is more than a step size in degrees
+		if (abs(xToMove) >= (step_size))
 		{
 			//0 to 90 degrees, 0 = Horizontal, 90 = Vertical, anything > 90 or < 0 is ignored
 			// 
 			//Step if positive
-			if (yToMove > 0 && targetLocalPosDeg.y < 90)
+			if (xToMove > 0 && targetAltAz.x < 90)
 			{
 				coordinate::stepUp();
-				currentLocalPosDeg.y += _STEP_SIZE;
+				currentAltAz.x += step_size;
+
 			}
 			//Step if negative
-			if (yToMove < 0 && targetLocalPosDeg.y > 0)
+			if (xToMove < 0 && targetAltAz.x > 0)
 			{
 				coordinate::stepDown();
-				currentLocalPosDeg.y -= _STEP_SIZE;
+				currentAltAz.x -= step_size;
 			}
 		}
 		//Update target Alt Az
-		targetLocalPosDeg = coordinate::equatorialToLocal(targetRaDec.x, targetRaDec.y, currentLatLongDeg);
+		targetAltAz = coordinate::equatorialToLocal(targetRaDec.x, targetRaDec.y, currentLatLongDeg);
+		xToMove = targetAltAz.x - currentAltAz.x;
+		yToMove = targetAltAz.y - currentAltAz.y;
 	}
 
 
@@ -246,7 +307,7 @@ void coordinate::gotoCoordsDeg(twoAxisDeg targetRaDec)
 
 void coordinate::stepRight()
 {	//Set direction
-	gpioWrite(DIR1, PI_HIGH);
+	gpioWrite(DIR1, PI_LOW);
 	//Step
 	gpioWrite(PUL1, PI_HIGH);
 	gpioDelay(_DELAY);
@@ -256,7 +317,7 @@ void coordinate::stepRight()
 
 void coordinate::stepLeft()
 {	//Set direction
-	gpioWrite(DIR1, PI_LOW);
+	gpioWrite(DIR1, PI_HIGH);
 	//Step 
 	gpioWrite(PUL1, PI_HIGH);
 	gpioDelay(_DELAY);
@@ -267,7 +328,7 @@ void coordinate::stepLeft()
 void coordinate::stepUp()
 {		
 	//Set direction
-	gpioWrite(DIR2, PI_HIGH);
+	gpioWrite(DIR2, PI_LOW);
 	//Step
 	gpioWrite(PUL2, PI_HIGH);
 	gpioDelay(_DELAY);
@@ -278,7 +339,7 @@ void coordinate::stepUp()
 void coordinate::stepDown()
 {
 	//Set direction
-	gpioWrite(DIR2, PI_LOW);
+	gpioWrite(DIR2, PI_HIGH);
 	//Step
 	gpioWrite(PUL2, PI_HIGH);
 	gpioDelay(_DELAY);
