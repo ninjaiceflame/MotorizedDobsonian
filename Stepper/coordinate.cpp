@@ -138,6 +138,7 @@ void coordinate::manualControl()
 	char key = NULL;
 	while (1)
 	{
+		cout << "Enter directions on keyboard (WASD), then press enter" << endl;
 		key = getchar();
 		switch (key)
 		{
@@ -147,7 +148,9 @@ void coordinate::manualControl()
 			for (int i = 0; i < 1000; i++)
 			{
 				stepUp();
+				
 			}
+			cout << "Moving up!" << endl;
 			break;
 
 			//Down
@@ -156,6 +159,7 @@ void coordinate::manualControl()
 			{
 				stepDown();
 			}
+			cout << "Moving Down!" << endl;
 			break;
 
 			//Left
@@ -164,6 +168,7 @@ void coordinate::manualControl()
 			{
 				stepLeft();
 			}
+			cout << "Moving left!" << endl;
 			break;
 
 			//Right
@@ -172,9 +177,11 @@ void coordinate::manualControl()
 			{
 				stepRight();
 			}
+			cout << "Moving right!" << endl;
 			break;
 
 		case 'x':
+			cout << "Exiting..." << endl;
 			return;
 		}
 
@@ -241,6 +248,7 @@ void coordinate::gotoCoordsDeg(twoAxisDeg targetRaDec)
 		targetAltAz = coordinate::equatorialToLocal(targetRaDec.x, targetRaDec.y, currentLatLongDeg);
 		xToMove = targetAltAz.x - currentAltAz.x;
 		yToMove = targetAltAz.y - currentAltAz.y;
+		cout << "Tracking" << endl;
 	}
 
 
